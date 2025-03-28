@@ -8,13 +8,13 @@ export default function Auth() {
       <div>
          {/* <Header /> */}
          <div className="flex items-center justify-center mt-[75px]">
-            <Tabs defaultValue="login" className="w-[400px]"> 
+            <Tabs defaultValue="login" className="w-[400px]">
                <div className="flex justify-center">
-               {/* <TabsList className="grid w-full grid-cols-2 mb-3"> */}
-               <TabsList className="">
-                  <TabsTrigger value="login">LOGIN</TabsTrigger>
-                  <TabsTrigger value="register">REGISTER</TabsTrigger>
-               </TabsList>
+                  {/* <TabsList className="grid w-full grid-cols-2 mb-3"> */}
+                  <TabsList className="">
+                     <TabsTrigger value="login">LOGIN</TabsTrigger>
+                     <TabsTrigger value="register">REGISTER</TabsTrigger>
+                  </TabsList>
                </div>
                <LoginForm />
                <RegisterForm />

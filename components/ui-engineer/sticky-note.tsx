@@ -2,6 +2,8 @@
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
 
 interface StickyNoteProps {
   text?: string;
@@ -19,6 +21,7 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
   const [isDragging, setIsDragging] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const noteRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
   
   const x = useMotionValue(initialX);
   const y = useMotionValue(initialY);
@@ -47,6 +50,11 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
   const handleExpandClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
+  };
+
+  const handleRegisterClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    router.push("/auth");
   };
 
   return (
@@ -110,6 +118,15 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
         <div className="text-gray-600 text-sm leading-relaxed select-none flex-1 overflow-y-auto">
           {text}
         </div>
+      )}
+      
+      {date === "Register" && (
+        <Button
+            onClick={handleRegisterClick}
+            className="mt-4 px-4 py-2 bg-[#FF9999] text-white rounded-lg hover:bg-[#ff8080] transition-colors duration-200"
+         >
+            Register Now
+        </Button>
       )}
       
       <div className="flex items-center justify-between pt-2 mt-auto border-t border-gray-100">

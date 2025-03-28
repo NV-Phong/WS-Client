@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@tailwind utilities;
 
 @custom-variant dark (&:is(.dark *));
 
@@ -155,9 +156,6 @@
 
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Ẩn scrollbar cho Chrome, Safari và Opera */
 ::-webkit-scrollbar {
@@ -166,6 +164,6 @@
 
 /* Ẩn scrollbar cho IE, Edge và Firefox */
 * {
-  -ms-overflow-style: none;  /* IE và Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; 
+  scrollbar-width: none; 
 }
