@@ -25,7 +25,9 @@ export default function Home() {
             <div className="fixed top-4 right-4 z-50">
                <ModeToggle />
             </div>
-            <StickyNotes />
+            <div className="z-50">
+               <StickyNotes />
+            </div>
 
             <div className="flex flex-col items-center justify-center">
                <div className="mb-9 max-w-7xl mx-auto w-full pt-20 md:pt-0 text-center">
@@ -40,7 +42,7 @@ export default function Home() {
                   <p className="font-normal text-base text-neutral-700 max-w-3xl mx-auto">
                      This website is designed to provide a seamless and
                      efficient platform for collaboration, productivity, and
-                     innovation. Whether you're managing projects, sharing
+                     innovation. Whether you&apos;re managing projects, sharing
                      ideas, or organizing tasks, WorkSpace offers intuitive
                      tools and features to streamline your workflow and connect
                      with your team in real-time. Join us to transform the way
