@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+// import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
    title: "WorkSpace",
@@ -30,6 +31,7 @@ export default function RootLayout({
                {children}
                <SpeedInsights />
                <Analytics />
+               {/* <Navbar /> */}
             </ThemeProvider>
          </body>
       </html>

@@ -1,7 +1,7 @@
 "use client";
 import GradualSpacing from "@/components/magicui/gradual-spacing";
 import Particles from "@/components/magicui/particles";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+// import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Spotlight } from "@/components/aceternity/spotlight-new";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
@@ -21,8 +21,8 @@ export default function Home() {
             // className="-top-40 left-0 md:left-60 md:-top-20"
             // fill="white"
             />
-
-            <ModeToggle />
+            
+            {/* <ModeToggle /> */}
 
             <div className="flex flex-col items-center justify-center">
                <div className="mb-9 max-w-7xl mx-auto relative z-10 w-full pt-20 md:pt-0 text-center">
