@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface StickyNoteProps {
   text?: string;
@@ -17,6 +17,8 @@ interface StickyNoteProps {
 
 const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex, onDragStart, onDragEnd }: StickyNoteProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const noteRef = useRef<HTMLDivElement>(null);
   
   const x = useMotionValue(initialX);
   const y = useMotionValue(initialY);
@@ -29,23 +31,54 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
     scaleMotion.set(isDragging ? 1.02 : 1);
   }, [isDragging, scaleMotion]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isExpanded && noteRef.current && !noteRef.current.contains(event.target as Node)) {
+        setIsExpanded(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isExpanded]);
+
+  const handleExpandClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <motion.div
-      className="absolute w-64 h-64 p-6 cursor-pointer bg-[#FFFAF0] rounded-2xl shadow-lg touch-none flex flex-col"
+      ref={noteRef}
+      className={`absolute p-6 cursor-pointer bg-[#FFFAF0] rounded-2xl shadow-lg touch-none flex flex-col ${isExpanded ? 'w-96 h-96' : 'w-64 h-64'}`}
       style={{
-        rotate: rotation,
         x,
         y,
         scale: scaleMotion,
-        zIndex,
+        zIndex: isExpanded ? 999 : zIndex,
+      }}
+      animate={{
+        rotate: isExpanded ? 0 : rotation,
+        scale: isExpanded ? 1.2 : 1,
+        opacity: 1,
+        transition: {
+          type: "spring",
+          stiffness: 200,
+          damping: 25,
+          mass: 1,
+          ease: [0.23, 1, 0.32, 1],
+          duration: 0.3
+        }
       }}
       drag
       dragMomentum={false}
-      dragElastic={0.01} // Giảm độ đàn hồi khi kéo
+      dragElastic={0.01}
       dragTransition={{ 
-        bounceStiffness: 800, // Tăng độ cứng
-        bounceDamping: 50,    // Tăng độ giảm chấn
-        power: 0.5            // Giảm lực kéo
+        bounceStiffness: 800,
+        bounceDamping: 50,   
+        power: 0.5           
       }}
       onDragStart={() => {
         setIsDragging(true);
@@ -56,15 +89,16 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
         onDragEnd?.(info.point.x, info.point.y);
       }}
       whileHover={{
-        scale: isDragging ? 1.02 : 1.01,
-        rotate: rotation + (Math.random() - 0.5) * 3,
+        scale: isDragging ? 1.02 : (isExpanded ? 1.2 : 1.01),
+        rotate: isExpanded ? 0 : rotation + (Math.random() - 0.5) * 3,
+        transition: {
+          type: "spring",
+          stiffness: 400,
+          damping: 25
+        }
       }}
-      initial={{ opacity: 0, y: initialY + 20 }}
-      animate={{ opacity: 1, y: initialY }}
-      transition={{ 
-        duration: 0.2,
-        ease: "easeOut"
-      }}
+      initial={{ opacity: 0 }}
+      layout
     >
       {date && (
         <div className="text-[#FF9999] text-2xl font-medium mb-2 select-none">
@@ -89,7 +123,7 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
           Note • {timeAgo}
         </div>
         
-        <div className="select-none">
+        <div className="select-none cursor-pointer" onClick={handleExpandClick}>
           <svg className="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M13 11L21.2 2.80005" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M22 6.8V2H17.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

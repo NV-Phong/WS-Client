@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import StickyNote from "./sticky-note";
+import { motion } from "framer-motion";
 
 const StickyNotes = () => {
   const [notes, setNotes] = useState([
@@ -37,22 +38,22 @@ const StickyNotes = () => {
     },
     { 
       id: 4, 
-      date: "Jun 20", 
+      date: "Register", 
       timeAgo: "1 week ago", 
       x: 1200, 
       y: 300, 
       rotation: 4, 
       zIndex: 3,
-      text: "Meeting với team vào 2PM:\n- Review sprint hiện tại\n- Planning cho sprint mới\n- Thảo luận về technical debt\n- Demo features mới"
+      text: "Create Your Account to Unleash Your Dreams"
     },
   ]);
 
   const handleDragStart = (id: number) => () => {
-    setNotes(notes.map(note => 
-      note.id === id 
-        ? { ...note, zIndex: Math.max(...notes.map(n => n.zIndex)) + 1 }
-        : note
-    ));
+    const draggedNote = notes.find(note => note.id === id);
+    if (!draggedNote) return;
+    
+    const otherNotes = notes.filter(note => note.id !== id);
+    setNotes([...otherNotes, draggedNote]);
   };
 
   const handleDragEnd = (id: number) => (x: number, y: number) => {
@@ -65,19 +66,39 @@ const StickyNotes = () => {
 
   return (
     <div className="absolute inset-0 overflow-hidden">
-      {notes.map((note) => (
-        <StickyNote
+      {notes.map((note, index) => (
+        <motion.div
           key={note.id}
-          date={note.date}
-          timeAgo={note.timeAgo}
-          text={note.text}
-          initialX={note.x}
-          initialY={note.y}
-          rotation={note.rotation}
-          zIndex={note.zIndex}
-          onDragStart={handleDragStart(note.id)}
-          onDragEnd={handleDragEnd(note.id)}
-        />
+          initial={{ 
+            opacity: 0,
+            y: 100,
+            scale: 0.8,
+            rotate: note.rotation
+          }}
+          animate={{ 
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotate: note.rotation
+          }}
+          transition={{
+            duration: 0.5,
+            delay: index * 0.1,
+            ease: "easeOut"
+          }}
+        >
+          <StickyNote
+            date={note.date}
+            timeAgo={note.timeAgo}
+            text={note.text}
+            initialX={note.x}
+            initialY={note.y}
+            rotation={note.rotation}
+            zIndex={note.zIndex}
+            onDragStart={handleDragStart(note.id)}
+            onDragEnd={handleDragEnd(note.id)}
+          />
+        </motion.div>
       ))}
     </div>
   );
