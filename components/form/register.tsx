@@ -33,12 +33,13 @@ export default function RegisterForm() {
       // onSubmit={handleRegister}
       >
          <TabsContent value="register">
-            <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
+            {/* <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg"> */}
+            <Card className="bg-background shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
                <CardHeader>
-                  <BoxReveal boxColor={"#64748B"} duration={0.3}>
-                     <CardTitle className="mb-1 text-xl">REGISTER</CardTitle>
+                  <BoxReveal boxColor={"#FF9999"} duration={0.3}>
+                     <CardTitle className="mb-1 text-xl text-[#FF9999]">REGISTER</CardTitle>
                   </BoxReveal>
-                  <BoxReveal boxColor={"#64748B"} duration={0.3}>
+                  <BoxReveal boxColor={"#FF9999"} duration={0.3}>
                      <CardDescription>
                         Create Your Account to Unleash Your Dreams
                      </CardDescription>

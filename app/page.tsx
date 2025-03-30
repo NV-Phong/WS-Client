@@ -2,7 +2,6 @@
 import GradualSpacing from "@/components/magicui/gradual-spacing";
 import Particles from "@/components/magicui/particles";
 import StickyNotes from "@/components/ui-engineer/sticky-notes";
-import GradientBackground from "@/components/ui-engineer/gradient-background";
 // import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Spotlight } from "@/components/aceternity/spotlight-new";
 import { useTheme } from "next-themes";
@@ -18,7 +17,6 @@ export default function Home() {
 
    return (
       <div className="relative min-h-screen">
-         <GradientBackground />
          <Spotlight />
 
          <div className="relative z-10 flex items-center justify-center min-h-screen">

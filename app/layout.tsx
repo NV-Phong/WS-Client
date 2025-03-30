@@ -3,6 +3,9 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import GradientBackground from "@/components/ui-engineer/gradient-background";
+import { Toaster } from "@/components/ui/sonner";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 // import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
@@ -24,15 +27,19 @@ export default function RootLayout({
          <body>
             <ThemeProvider
                attribute="class"
-               defaultTheme="light"
+               defaultTheme="pastel-pink"
                enableSystem
                disableTransitionOnChange
+               themes={["light", "dark", "pastel-pink"]}
             >
                {children}
                <SpeedInsights />
                <Analytics />
                {/* <Navbar /> */}
-            </ThemeProvider>
+               <GradientBackground/>
+               <Toaster />
+               <ModeToggle />
+            </ThemeProvider>            
          </body>
       </html>
    );

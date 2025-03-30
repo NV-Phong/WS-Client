@@ -32,12 +32,13 @@ export default function LoginForm() {
       // onSubmit={handleLogin}
       >
          <TabsContent value="login">
-            <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
+            {/* <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg"> */}
+            <Card className="bg-background shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
                <CardHeader>
-                  <BoxReveal boxColor={"#64748B"} duration={0.3}>
-                     <CardTitle className="mb-1 text-xl">LOGIN</CardTitle>
+                  <BoxReveal boxColor={"#FF9999"} duration={0.3}>
+                     <CardTitle className="mb-1 text-xl text-[#FF9999]">LOGIN</CardTitle>
                   </BoxReveal>
-                  <BoxReveal boxColor={"#64748B"} duration={0.3}>
+                  <BoxReveal boxColor={"#FF9999"} duration={0.3}>
                      <CardDescription>
                         Make changes to your account here. Click save when
                         you&apos;re done.
@@ -80,7 +81,8 @@ export default function LoginForm() {
                      </button>
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                     <span className="bg-card px-2 text-muted-foreground">
+                     {/* <span className="bg-card px-2 text-muted-foreground bg-[#FFFAF0]"> */}
+                     <span className="bg-[#FFFAF0] px-2 text-muted-foreground">
                         Or continue with
                      </span>
                   </div>

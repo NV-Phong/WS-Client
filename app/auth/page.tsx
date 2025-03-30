@@ -12,8 +12,8 @@ export default function Auth() {
                <div className="flex justify-center">
                   {/* <TabsList className="grid w-full grid-cols-2 mb-3"> */}
                   <TabsList className="">
-                     <TabsTrigger value="login">LOGIN</TabsTrigger>
-                     <TabsTrigger value="register">REGISTER</TabsTrigger>
+                     <TabsTrigger value="login" className="text-[#FF9999]">LOGIN</TabsTrigger>
+                     <TabsTrigger value="register" className="text-[#FF9999]">REGISTER</TabsTrigger>
                   </TabsList>
                </div>
                <LoginForm />

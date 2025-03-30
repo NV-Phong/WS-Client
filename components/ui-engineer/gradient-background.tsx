@@ -1,6 +1,23 @@
 "use client";
 
+import { usePathname } from 'next/navigation';
+
 const GradientBackground = () => {
+  const pathname = usePathname();
+  
+  // Danh sách các đường dẫn không muốn hiển thị gradient
+  const excludePaths = [
+    '/themes',
+    // Thêm các đường dẫn khác vào đây
+  ];
+
+  // Kiểm tra xem đường dẫn hiện tại có trong danh sách loại trừ không
+  const shouldShowGradient = !excludePaths.some(path => pathname.startsWith(path));
+
+  if (!shouldShowGradient) {
+    return null;
+  }
+
   return (
     <div className="absolute inset-0 -z-10">
       {/* <div className="w-full h-full bg-[#FFF5E9] relative overflow-hidden"> */}
