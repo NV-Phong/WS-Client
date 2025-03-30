@@ -37,7 +37,7 @@ export default function RegisterForm() {
             <Card className="bg-background shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
                <CardHeader>
                   <BoxReveal boxColor={"#FF9999"} duration={0.3}>
-                     <CardTitle className="mb-1 text-xl text-[#FF9999]">REGISTER</CardTitle>
+                     <CardTitle className="mb-1 text-xl">REGISTER</CardTitle>
                   </BoxReveal>
                   <BoxReveal boxColor={"#FF9999"} duration={0.3}>
                      <CardDescription>

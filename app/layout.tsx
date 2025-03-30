@@ -5,7 +5,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GradientBackground from "@/components/ui-engineer/gradient-background";
 import { Toaster } from "@/components/ui/sonner";
-import { ModeToggle } from "@/components/ui/mode-toggle";
+// import { ModeToggle } from "@/components/ui/mode-toggle";
 // import Navbar from "@/components/layout/navbar";
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default function RootLayout({
                {/* <Navbar /> */}
                <GradientBackground/>
                <Toaster />
-               <ModeToggle />
+               {/* <ModeToggle /> */}
             </ThemeProvider>            
          </body>
       </html>

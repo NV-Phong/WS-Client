@@ -15,9 +15,10 @@ interface StickyNoteProps {
   zIndex: number;
   onDragStart?: () => void;
   onDragEnd?: (x: number, y: number) => void;
+  animation?: "flyIn" | "flyOut" | "none";
 }
 
-const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex, onDragStart, onDragEnd }: StickyNoteProps) => {
+const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex, onDragStart, onDragEnd, animation = "none" }: StickyNoteProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const noteRef = useRef<HTMLDivElement>(null);
@@ -57,6 +58,97 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
     router.push("/auth");
   };
 
+  const getAnimationVariants = () => {
+    const baseVariants = {
+      initial: { opacity: 0 },
+      animate: { 
+        opacity: 1,
+        rotate: isExpanded ? 0 : rotation,
+        scale: isExpanded ? 1.2 : 1,
+        transition: {
+          type: "spring",
+          stiffness: 200,
+          damping: 25,
+          mass: 1,
+          ease: [0.23, 1, 0.32, 1],
+          duration: 0.3
+        }
+      },
+      exit: { opacity: 0 }
+    };
+
+    switch (animation) {
+      case "flyIn":
+        return {
+          initial: { 
+            opacity: 0,
+            x: initialX + 100,
+            y: initialY + 100,
+            scale: 0.5
+          },
+          animate: { 
+            ...baseVariants.animate,
+            x: initialX,
+            y: initialY,
+            scale: 1,
+            transition: {
+              type: "spring",
+              stiffness: 200,
+              damping: 20,
+              mass: 1
+            }
+          },
+          exit: {
+            opacity: 0,
+            x: initialX - 100,
+            y: initialY - 100,
+            scale: 0.5,
+            transition: {
+              type: "spring",
+              stiffness: 200,
+              damping: 20,
+              mass: 1
+            }
+          }
+        };
+      case "flyOut":
+        return {
+          initial: { 
+            opacity: 0,
+            x: initialX - 100,
+            y: initialY - 100,
+            scale: 0.5
+          },
+          animate: { 
+            ...baseVariants.animate,
+            x: initialX,
+            y: initialY,
+            scale: 1,
+            transition: {
+              type: "spring",
+              stiffness: 200,
+              damping: 20,
+              mass: 1
+            }
+          },
+          exit: {
+            opacity: 0,
+            x: initialX + 100,
+            y: initialY + 100,
+            scale: 0.5,
+            transition: {
+              type: "spring",
+              stiffness: 200,
+              damping: 20,
+              mass: 1
+            }
+          }
+        };
+      default:
+        return baseVariants;
+    }
+  };
+
   return (
     <motion.div
       ref={noteRef}
@@ -67,19 +159,10 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
         scale: scaleMotion,
         zIndex: isExpanded ? 999 : zIndex,
       }}
-      animate={{
-        rotate: isExpanded ? 0 : rotation,
-        scale: isExpanded ? 1.2 : 1,
-        opacity: 1,
-        transition: {
-          type: "spring",
-          stiffness: 200,
-          damping: 25,
-          mass: 1,
-          ease: [0.23, 1, 0.32, 1],
-          duration: 0.3
-        }
-      }}
+      variants={getAnimationVariants()}
+      initial="initial"
+      animate="animate"
+      exit="exit"
       drag
       dragMomentum={false}
       dragElastic={0.01}
@@ -105,7 +188,6 @@ const StickyNote = ({ text, date, timeAgo, initialX, initialY, rotation, zIndex,
           damping: 25
         }
       }}
-      initial={{ opacity: 0 }}
       layout
     >
       {date && (
