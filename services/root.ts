@@ -1,7 +1,7 @@
 export async function fetchData() {
    try {
       const res = await fetch(`${process.env.API_SERVER}`, {
-         cache: "no-store",
+         next: { revalidate: 60 }
       });
 
       const response = await res.json();
