@@ -154,6 +154,7 @@
    --sidebar-border: oklch(0.928 0.006 264.531);
    --sidebar-ring: oklch(0.707 0.022 261.325);
    --selection: oklch(0.79 0.1226 20.19);
+   --icon:oklch(0.51 0 0);
 }
 
 @layer base {
