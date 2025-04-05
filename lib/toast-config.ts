@@ -1,24 +1,18 @@
 import { toast } from "sonner";
 
+const commonToastStyle = {
+  className: "bg-background border-border",
+  style: {
+    background: "var(--background)",
+    border: "1px solid var(--border)",
+    color: "var(--foreground)",
+    borderRadius: "var(--radius)",
+  },
+};
+
 export const toastConfig = {
-  success: {
-    className: "bg-green-50 border-green-200",
-    style: {
-      background: "var(--accent)",
-      border: "1px solid var(--border)",
-      color: "var(--accent-foreground)",
-      borderRadius: "var(--radius)",
-    },
-  },
-  error: {
-    className: "bg-background border-border",
-    style: {
-      background: "var(--background)",
-      border: "1px solid var(--border)",
-      color: "var(--foreground)",
-      borderRadius: "var(--radius)",
-    },
-  },
+  success: commonToastStyle,
+  error: commonToastStyle,
 };
 
 export const showToast = {
