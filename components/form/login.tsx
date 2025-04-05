@@ -10,27 +10,25 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { useAuth } from "@/hooks/auth/use-auth";
-// import { useLogin } from "@/hooks/auth/use-login";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { useLogin } from "@/hooks/auth/use-login";
 import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
 
 export default function LoginForm() {
-   // const { isSubmitting, handleCancel } = useAuth();
+   const { isSubmitting, handleCancel } = useAuth();
 
-   // const {
-   //    username,
-   //    setUserName,
-   //    password,
-   //    setPassword,
-   //    handleLogin,
-   //    handleGithubLogin,
-   // } = useLogin();
+   const {
+      username,
+      setUsername,
+      password,
+      setPassword,
+      handleLogin,
+      // handleGithubLogin,
+   } = useLogin();
 
    return (
-      <form
-      // onSubmit={handleLogin}
-      >
+      <form onSubmit={handleLogin}>
          <TabsContent value="login">
             {/* <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg"> */}
             <Card className="bg-background shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
@@ -91,8 +89,8 @@ export default function LoginForm() {
                      <Label htmlFor="username">Email or Username</Label>
                      <Input
                         className=" text-sm"
-                        // value={username}
-                        // onChange={(event) => setUserName(event.target.value)}
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
                         placeholder="Enter Your UserName"
                      />
                   </div>
@@ -101,23 +99,17 @@ export default function LoginForm() {
                      <Input
                         className="text-sm"
                         type="password"
-                        // value={password}
-                        // onChange={(event) => setPassword(event.target.value)}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
                         placeholder="Enter Your Password"
                      />
                   </div>
-
-                  {/* <div className="relative flex justify-center text-xs uppercase">
-                     <span className=" tranparent px-2 text-muted-foreground border-input bg-transparent">
-                        Or continue with
-                     </span>
-                  </div> */}
                </CardContent>
                <CardFooter className="align justify-between">
                   <Button
                      variant="outline"
                      className="w-2/5"
-                     // onClick={handleCancel}
+                     onClick={handleCancel}
                      type="button"
                   >
                      Cancel
@@ -125,7 +117,7 @@ export default function LoginForm() {
                   <Button
                      className="w-2/5"
                      type="submit"
-                     // disabled={isSubmitting}
+                     disabled={isSubmitting}
                   >
                      Login Now
                   </Button>
