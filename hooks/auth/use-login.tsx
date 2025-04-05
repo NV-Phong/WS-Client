@@ -3,7 +3,7 @@
 import Cookies from "js-cookie";
 import { useAuth } from "./use-auth";
 import { login } from "@/services/api";
-import { toast } from "sonner";
+import { showToast } from "@/lib/toast-config";
 
 export function useLogin() {
    const {
@@ -28,15 +28,14 @@ export function useLogin() {
             Cookies.set("refresh_token", response.data.data.refresh_token, {
                expires: 30,
             });
-            toast.success("Login Successfully", {
-               description: "Let go! to unleash your dreams.",
-            });
+            showToast.success("Login Successfully", "Let go! to unleash your dreams.");
             router.push("/task-manager");
          }
       } catch (error: any) {
-         toast.error("Login Failed", {
-            description: error.response?.data?.message || "We have a problem, Let's try again later 😭",
-         });
+         showToast.error(
+            "Login Failed",
+            error.response?.data?.message || "We have a problem, Let's try again later 😭"
+         );
       } finally {
          setIsSubmitting(false);
       }

@@ -15,5 +15,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-   matcher: ["/((?!_next|auth|test).*)"],
+   matcher: ["/((?!_next|auth|test|themes/color-visualizer).*)"],
 };
