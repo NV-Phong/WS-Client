@@ -31,7 +31,7 @@ export function useLogin() {
             toast.success("Login Successfully", {
                description: "Let go! to unleash your dreams.",
             });
-            router.push("/workspace");
+            router.push("/task-manager");
          }
       } catch (error: any) {
          toast.error("Login Failed", {

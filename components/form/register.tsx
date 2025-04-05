@@ -10,28 +10,26 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { useAuth } from "@/hooks/auth/use-auth";
-// import { useRegister } from "@/hooks/auth/use-register";
+import { useAuth } from "@/hooks/auth/use-auth";
+import { useRegister } from "@/hooks/auth/use-register";
 import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
 
 export default function RegisterForm() {
-   // const { isSubmitting, handleCancel } = useAuth();
-   // const {
-   //    username,
-   //    password,
-   //    email,
-   //    displayName,
-   //    setUserName,
-   //    setPassword,
-   //    setEmail,
-   //    setDisplayName,
-   //    handleRegister,
-   // } = useRegister();
+   const { isSubmitting, handleCancel } = useAuth();
+   const {
+      username,
+      password,
+      email,
+      displayName,
+      setUsername,
+      setPassword,
+      setEmail,
+      setDisplayName,
+      handleRegister,
+   } = useRegister();
    return (
-      <form
-      // onSubmit={handleRegister}
-      >
+      <form onSubmit={handleRegister}>
          <TabsContent value="register">
             {/* <Card className="shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg"> */}
             <Card className="bg-background shadow-xl ring-1 ring-gray-900/5 backdrop-blur-lg">
@@ -50,8 +48,8 @@ export default function RegisterForm() {
                      <Label htmlFor="username">UserName</Label>
                      <Input
                         className="text-sm"
-                        // value={username}
-                        // onChange={(event) => setUserName(event.target.value)}
+                        value={username}
+                        onChange={(event) => setUsername(event.target.value)}
                         placeholder="Enter Your UserName"
                      />
                   </div>
@@ -60,8 +58,8 @@ export default function RegisterForm() {
                      <Input
                         className="text-sm"
                         type="email"
-                        // value={email}
-                        // onChange={(event) => setEmail(event.target.value)}
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                         placeholder="Enter Your Email"
                      />
                   </div>
@@ -70,8 +68,8 @@ export default function RegisterForm() {
                      <Input
                         className="text-sm"
                         type="password"
-                        // value={password}
-                        // onChange={(event) => setPassword(event.target.value)}
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
                         placeholder="Enter Your Password"
                      />
                   </div>
@@ -80,8 +78,8 @@ export default function RegisterForm() {
                      <Input
                         className="text-sm"
                         type="text"
-                        // value={displayName}
-                        // onChange={(event) => setDisplayName(event.target.value)}
+                        value={displayName}
+                        onChange={(event) => setDisplayName(event.target.value)}
                         placeholder="Enter Your Display name"
                      />
                   </div>
@@ -91,14 +89,14 @@ export default function RegisterForm() {
                      className="w-2/5"
                      variant="outline"
                      type="button"
-                     // onClick={handleCancel}
+                     onClick={handleCancel}
                   >
                      Cancel
                   </Button>
                   <Button
                      className="w-2/5"
                      type="submit"
-                     // disabled={isSubmitting}
+                     disabled={isSubmitting}
                   >
                      Register
                   </Button>
