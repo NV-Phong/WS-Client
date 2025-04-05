@@ -30,7 +30,7 @@ export function useRegister() {
          );
          if (response.status === 201) {
             toast.success("Register Successfully", {
-               description: "Let Login to unleash your dreams.",
+               description: "Let login to unleash your dreams.",
             });
             setTimeout(() => {
                window.location.reload();
@@ -38,7 +38,7 @@ export function useRegister() {
          }
       } catch (error: any) {
          toast.error("Register Failed", {
-            description: error.response?.data?.message || "Please check your registration information again.",
+            description: error.response?.data?.message || "We have a problem, Let's try again later 😭",
          });
       } finally {
          setIsSubmitting(false);

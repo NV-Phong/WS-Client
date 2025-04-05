@@ -69,7 +69,7 @@ export const logout = async () => {
 export const checkTokenAndRedirect = (router: any) => {
    const token = Cookies.get("access_token");
    if (token) {
-      router.push("/dashboard");
+      router.push("/task-manager");
    }
 };
 

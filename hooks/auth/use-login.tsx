@@ -35,7 +35,7 @@ export function useLogin() {
          }
       } catch (error: any) {
          toast.error("Login Failed", {
-            description: error.response?.data?.message || "Please check your login information again.",
+            description: error.response?.data?.message || "We have a problem, Let's try again later 😭",
          });
       } finally {
          setIsSubmitting(false);
