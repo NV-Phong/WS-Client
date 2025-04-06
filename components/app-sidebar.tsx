@@ -127,7 +127,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-   const { teams, isLoading } = useGetTeams();
+   const { teams } = useGetTeams();
    
    const formattedTeams = teams.map(team => ({
       name: team.TeamName,

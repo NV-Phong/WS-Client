@@ -75,7 +75,7 @@ export function TeamSwitcher({
             <SidebarMenuItem>
                <SidebarMenuButton size="lg" disabled>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  <span className="ml-2">Đang tải teams...</span>
+                  <span className="ml-2">Teams is loading...</span>
                </SidebarMenuButton>
             </SidebarMenuItem>
          </SidebarMenu>
@@ -100,10 +100,10 @@ export function TeamSwitcher({
                      </div>
                      <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                           {activeTeam?.name || "Bạn chưa có team nào"}
+                           {activeTeam?.name || "You don't have any team"}
                         </span>
                         <span className="truncate text-xs">
-                           {activeTeam?.plan || "Chưa có mô tả"}
+                           {activeTeam?.plan || "Your team doesn't have any description"}
                         </span>
                      </div>
                      <ChevronsUpDown className="ml-auto" />
@@ -120,7 +120,7 @@ export function TeamSwitcher({
                   </DropdownMenuLabel>
                   {teams.length === 0 ? (
                      <div className="p-2 text-sm text-muted-foreground">
-                        Không có teams nào
+                        You don&apos;t have any team
                      </div>
                   ) : (
                      teams.map((team, index) => (
