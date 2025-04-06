@@ -15,6 +15,8 @@ import {
    SidebarMenuButton,
    SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { TeamSwitcher } from "@/components/team-switcher";
+import { Users } from "lucide-react";
 
 const data = {
    user: {
@@ -22,6 +24,26 @@ const data = {
       email: "m@example.com",
       avatar: "/avatars/shadcn.jpg",
    },
+   teams: [
+      {
+         name: "Team A",
+         logo: Users,
+         plan: "Free Plan",
+         idteam: "team-a",
+      },
+      {
+         name: "Team B",
+         logo: Users,
+         plan: "Pro Plan",
+         idteam: "team-b",
+      },
+      {
+         name: "Team C",
+         logo: Users,
+         plan: "Enterprise Plan",
+         idteam: "team-c",
+      },
+   ],
    navMain: [
       {
          title: "Dashboard",
@@ -142,6 +164,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                </SidebarMenuItem>
             </SidebarMenu>
+            <TeamSwitcher teams={data.teams} />
          </SidebarHeader>
          <SidebarContent>
             <NavMain items={data.navMain} />
