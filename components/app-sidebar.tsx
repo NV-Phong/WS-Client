@@ -21,14 +21,14 @@ import { useGetTeams } from "@/hooks/team/use-get-teams";
 
 const data = {
    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
+      name: "NV-Phong",
+      email: "ui.engineer.workspace@gmail.com",
+      avatar: "/logo.svg",
    },
    navMain: [
       {
          title: "Space Engineer",
-         url: "",
+         url: "/workspace",
          icon: "saturn-02-solid-sharp",
       },
       {

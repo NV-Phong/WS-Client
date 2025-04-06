@@ -1,4 +1,5 @@
 import { HTMLAttributes } from 'react';
+import { cn } from '@/lib/utils';
 
 interface IconProps extends HTMLAttributes<HTMLDivElement> {
   name: string;
@@ -6,9 +7,10 @@ interface IconProps extends HTMLAttributes<HTMLDivElement> {
   color?: string;
 }
 
-export const Icon = ({ name, size = 24, color = 'var(--icon)', ...props }: IconProps) => {
+export const Icon = ({ name, size = 24, color = 'currentColor', className, ...props }: IconProps) => {
   return (
     <div 
+      className={cn('flex items-center justify-center', className)}
       style={{ 
         width: size, 
         height: size,

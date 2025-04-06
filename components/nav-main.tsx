@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Icon } from "@/components/ui-engineer/Icon"
 import { useNavigation } from "@/components/context/navigation-context"
+import { useRouter } from "next/navigation"
 
 import {
   SidebarGroup,
@@ -22,12 +23,16 @@ export function NavMain({
     icon: string
   }[]
 }) {
+  const router = useRouter()
   const { activeItem, setActiveItem, activeSection, setActiveSection } = useNavigation()
   const [hoveredItem, setHoveredItem] = useState<string>("")
 
-  const handleItemClick = (title: string) => {
+  const handleItemClick = (title: string, url: string) => {
     setActiveItem(title)
     setActiveSection("main")
+    if (url !== "#") {
+      router.push(url)
+    }
   }
 
   return (
@@ -37,13 +42,6 @@ export function NavMain({
         <SidebarMenu className="relative">
           <div className="absolute -left-4 -right-4 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-40" />
           <SidebarMenuItem className="flex items-center gap-2">
-            {/* <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-center text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-            >
-              <Icon name="circle-plus" size={20} color="var(--muted-foreground)" />
-              <span className="font-semibold">Quick Create</span>
-            </SidebarMenuButton> */}
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
@@ -54,7 +52,7 @@ export function NavMain({
             >
               <SidebarMenuButton 
                 tooltip={item.title}
-                onClick={() => handleItemClick(item.title)}
+                onClick={() => handleItemClick(item.title, item.url)}
                 onMouseEnter={() => setHoveredItem(item.title)}
                 onMouseLeave={() => setHoveredItem("")}
                 className={`relative w-full rounded-lg transition-all duration-300 ease-out 
