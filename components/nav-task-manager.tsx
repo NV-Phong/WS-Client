@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Icon } from "@/components/ui-engineer/Icon"
 import { useNavigation } from "@/components/context/navigation-context"
+import { useRouter } from "next/navigation"
 
 import {
   DropdownMenu,
@@ -33,10 +34,12 @@ export function NavTaskManager({
   const { isMobile } = useSidebar()
   const { activeItem, setActiveItem, activeSection, setActiveSection } = useNavigation()
   const [hoveredItem, setHoveredItem] = useState<string>("")
+  const router = useRouter()
 
-  const handleItemClick = (name: string) => {
+  const handleItemClick = (name: string, url: string) => {
     setActiveItem(name)
     setActiveSection("documents")
+    router.push(url)
   }
 
   return (
@@ -49,7 +52,7 @@ export function NavTaskManager({
               asChild
               onMouseEnter={() => setHoveredItem(item.name)}
               onMouseLeave={() => setHoveredItem("")}
-              onClick={() => handleItemClick(item.name)}
+              onClick={() => handleItemClick(item.name, item.url)}
               className={`relative w-full rounded-lg transition-all duration-300 ease-out 
                 ${activeItem === item.name && activeSection === "documents"
                   ? "bg-gradient-to-r from-primary/8 via-primary/5 to-transparent shadow-[0_2px_10px_-3px_rgba(var(--primary),0.3)] hover:shadow-[0_4px_12px_-3px_rgba(var(--primary),0.35)]" 
@@ -57,7 +60,7 @@ export function NavTaskManager({
                 }
               `}
             >
-              <a href={item.url} className="flex w-full items-center">
+              <div className="flex w-full items-center">
                 {/* Gradient border effect */}
                 <div className={`absolute inset-0 rounded-lg transition-opacity duration-300
                   ${activeItem === item.name && activeSection === "documents" ? "opacity-100" : "opacity-0"}
@@ -103,7 +106,7 @@ export function NavTaskManager({
                     {item.name}
                   </span>
                 </div>
-              </a>
+              </div>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

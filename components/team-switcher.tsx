@@ -61,10 +61,23 @@ export function TeamSwitcher({
       idteam: string;
    }) => {
       setActiveTeam(team);
-      Cookies.set("IDTeam", team.idteam, { expires: 7 });
+      // Lưu IDTeam vào cookie với thời hạn 7 ngày
+      Cookies.set("IDTeam", team.idteam, { 
+         expires: 7,
+         path: "/",
+         secure: true,
+         sameSite: "strict"
+      });
 
-      // router.refresh();
-      // window.location.reload();
+      // Lưu thêm thông tin team name để dễ dàng hiển thị
+      Cookies.set("TeamName", team.name, {
+         expires: 7,
+         path: "/",
+         secure: true,
+         sameSite: "strict"
+      });
+
+      // Chuyển hướng đến trang collection của team
       const formattedName = team.name.toLowerCase().replace(/\s+/g, "-");
       router.push(`/dashboard/collection/${formattedName}`);
    };
