@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import GradientBackground from "@/components/ui-engineer/gradient-background";
 import { Toaster } from "@/components/ui/sonner";
 import { NavigationProvider } from "@/components/context/navigation-context"
+import { ToastProvider } from "@/contexts/toast-context";
 // import { ModeToggle } from "@/components/ui/mode-toggle";
 // import Navbar from "@/components/layout/navbar";
 
@@ -34,7 +35,9 @@ export default function RootLayout({
                   disableTransitionOnChange
                   themes={["light", "dark", "pastel-pink"]}
                >
-                  {children}
+                  <ToastProvider>
+                     {children}
+                  </ToastProvider>
                   <SpeedInsights />
                   <Analytics />
                   {/* <Navbar /> */}

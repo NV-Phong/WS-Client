@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useGetWorkspaces } from "@/hooks/workspace/use-get-workspaces";
+import { useDeleteWorkspace } from "@/hooks/workspace/use-delete-workspace";
 import {
    Card,
    CardContent,
@@ -21,9 +22,22 @@ import {
    DropdownMenuItem,
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/contexts/toast-context";
 
 export default function WorkSpace() {
    const { workspaces, isLoading, error } = useGetWorkspaces();
+   const { deleteWorkspace, isLoading: isDeleting } = useDeleteWorkspace();
+   const { handleWorkspaceDeleted } = useToast();
+
+   const handleDeleteWorkspace = async (workspaceId: string) => {
+      try {
+         await deleteWorkspace(workspaceId);
+         handleWorkspaceDeleted();
+         // Không cần router.refresh() vì chúng ta sẽ reload trang sau khi nhấn Save
+      } catch (error) {
+         console.error("Failed to delete workspace:", error);
+      }
+   };
 
    return (
       <SidebarProvider
@@ -74,6 +88,7 @@ export default function WorkSpace() {
                                                    variant="ghost"
                                                    size="icon"
                                                    className="h-8 w-8 p-0"
+                                                   disabled={isDeleting}
                                                 >
                                                    <Icon
                                                       name="setup-01-solid-standard"
@@ -86,8 +101,12 @@ export default function WorkSpace() {
                                                 <DropdownMenuItem>
                                                    Edit
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem className="text-red-600">
-                                                   Remove
+                                                <DropdownMenuItem 
+                                                   className="text-red-600"
+                                                   onClick={() => handleDeleteWorkspace(workspace.IDWorkspace)}
+                                                   disabled={isDeleting}
+                                                >
+                                                   {isDeleting ? "Đang xóa..." : "Remove"}
                                                 </DropdownMenuItem>
                                              </DropdownMenuContent>
                                           </DropdownMenu>
@@ -104,9 +123,7 @@ export default function WorkSpace() {
                                              </CardDescription>
                                              <div className="mt-2 h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2">
                                                 <p className="text-sm text-muted-foreground">
-                                                   {
-                                                      workspace.WorkSpaceDescription
-                                                   }
+                                                   {workspace.WorkSpaceDescription}
                                                 </p>
                                              </div>
                                           </div>
