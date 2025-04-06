@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { Users } from "lucide-react";
+import { useGetTeams } from "@/hooks/team/use-get-teams";
 
 const data = {
    user: {
@@ -24,26 +25,6 @@ const data = {
       email: "m@example.com",
       avatar: "/avatars/shadcn.jpg",
    },
-   teams: [
-      {
-         name: "Team A",
-         logo: Users,
-         plan: "Free Plan",
-         idteam: "team-a",
-      },
-      {
-         name: "Team B",
-         logo: Users,
-         plan: "Pro Plan",
-         idteam: "team-b",
-      },
-      {
-         name: "Team C",
-         logo: Users,
-         plan: "Enterprise Plan",
-         idteam: "team-c",
-      },
-   ],
    navMain: [
       {
          title: "Dashboard",
@@ -146,6 +127,15 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+   const { teams, isLoading } = useGetTeams();
+   
+   const formattedTeams = teams.map(team => ({
+      name: team.TeamName,
+      logo: Users,
+      plan: team.TeamDescription,
+      idteam: team.IDTeam
+   }));
+
    return (
       <Sidebar collapsible="offcanvas" {...props}>
          <SidebarHeader>
@@ -164,7 +154,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                </SidebarMenuItem>
             </SidebarMenu>
-            <TeamSwitcher teams={data.teams} />
+            <TeamSwitcher teams={formattedTeams} />
          </SidebarHeader>
          <SidebarContent>
             <NavMain items={data.navMain} />

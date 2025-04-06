@@ -1,6 +1,6 @@
 import * as React from "react";
 import Cookies from "js-cookie"; // Thêm import js-cookie
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Loader2 } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -22,6 +22,7 @@ import { Button } from "./ui/button";
 
 export function TeamSwitcher({
    teams,
+   isLoading,
 }: {
    teams: {
       name: string;
@@ -29,6 +30,7 @@ export function TeamSwitcher({
       plan: string;
       idteam: string;
    }[];
+   isLoading?: boolean;
 }) {
    const { isMobile } = useSidebar();
    const [activeTeam, setActiveTeam] = React.useState<{
@@ -47,8 +49,8 @@ export function TeamSwitcher({
          if (storedTeam) {
             setActiveTeam(storedTeam);
          }
-      } else {
-         setActiveTeam(teams[0] || null); // Mặc định chọn team đầu tiên nếu không có trong Cookies
+      } else if (teams.length > 0) {
+         setActiveTeam(teams[0]);
       }
    }, [teams]);
 
@@ -66,6 +68,19 @@ export function TeamSwitcher({
       const formattedName = team.name.toLowerCase().replace(/\s+/g, "-");
       router.push(`/dashboard/collection/${formattedName}`);
    };
+
+   if (isLoading) {
+      return (
+         <SidebarMenu>
+            <SidebarMenuItem>
+               <SidebarMenuButton size="lg" disabled>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="ml-2">Đang tải teams...</span>
+               </SidebarMenuButton>
+            </SidebarMenuItem>
+         </SidebarMenu>
+      );
+   }
 
    return (
       <SidebarMenu>
@@ -85,10 +100,10 @@ export function TeamSwitcher({
                      </div>
                      <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                           {activeTeam?.name || "You Don't Have a Team"}
+                           {activeTeam?.name || "Bạn chưa có team nào"}
                         </span>
                         <span className="truncate text-xs">
-                           {activeTeam?.plan || "No Description"}
+                           {activeTeam?.plan || "Chưa có mô tả"}
                         </span>
                      </div>
                      <ChevronsUpDown className="ml-auto" />
@@ -103,21 +118,27 @@ export function TeamSwitcher({
                   <DropdownMenuLabel className="text-xs text-muted-foreground">
                      Teams
                   </DropdownMenuLabel>
-                  {teams.map((team, index) => (
-                     <DropdownMenuItem
-                        key={team.name}
-                        onClick={() => handleTeamSelect(team)}
-                        className="gap-2 p-2"
-                     >
-                        <div className="flex size-6 items-center justify-center rounded-sm border">
-                           <team.logo className="size-4 shrink-0" />
-                        </div>
-                        {team.name}
-                        <DropdownMenuShortcut>
-                           ⌘{index + 1}
-                        </DropdownMenuShortcut>
-                     </DropdownMenuItem>
-                  ))}
+                  {teams.length === 0 ? (
+                     <div className="p-2 text-sm text-muted-foreground">
+                        Không có teams nào
+                     </div>
+                  ) : (
+                     teams.map((team, index) => (
+                        <DropdownMenuItem
+                           key={team.idteam}
+                           onClick={() => handleTeamSelect(team)}
+                           className="gap-2 p-2"
+                        >
+                           <div className="flex size-6 items-center justify-center rounded-sm border">
+                              <team.logo className="size-4 shrink-0" />
+                           </div>
+                           {team.name}
+                           <DropdownMenuShortcut>
+                              ⌘{index + 1}
+                           </DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                     ))
+                  )}
                   <DropdownMenuSeparator />
 
                   <div className="p-2">
