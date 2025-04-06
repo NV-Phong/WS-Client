@@ -142,7 +142,10 @@ export function TeamSwitcher({
                   <DropdownMenuSeparator />
 
                   <div className="p-2">
-                     <CreateTeamPopover>
+                     <CreateTeamPopover onTeamCreated={() => {
+                        // Refresh teams list
+                        window.location.reload();
+                     }}>
                         <Button className="w-full">Create New Team</Button>
                      </CreateTeamPopover>
                   </div>
