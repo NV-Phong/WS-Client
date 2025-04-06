@@ -7,6 +7,7 @@ import { useNavigation } from "@/components/context/navigation-context"
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -31,6 +32,7 @@ export function NavMain({
 
   return (
     <SidebarGroup>
+      <SidebarGroupLabel className="font-semibold text-muted-foreground">Workspace</SidebarGroupLabel>
       <SidebarGroupContent className="flex flex-col gap-3">
         <SidebarMenu className="relative">
           <div className="absolute -left-4 -right-4 top-0 h-px bg-gradient-to-r from-transparent via-border to-transparent opacity-40" />

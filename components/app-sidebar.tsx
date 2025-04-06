@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { NavDocuments } from "@/components/nav-documents";
+import { NavTaskManager } from "@/components/nav-task-manager";
 import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
@@ -27,19 +27,14 @@ const data = {
    },
    navMain: [
       {
-         title: "Dashboard",
-         url: "#",
+         title: "Space Engineer",
+         url: "",
          icon: "saturn-02-solid-sharp",
       },
       {
          title: "Lifecycle",
          url: "#",
          icon: "analytics-up-solid-rounded",
-      },
-      {
-         title: "Analytics",
-         url: "#",
-         icon: "bubble-chat-solid-rounded",
       },
       {
          title: "Projects",
@@ -109,14 +104,19 @@ const data = {
    ],
    documents: [
       {
-         name: "Data Library",
-         url: "#",
+         name: "Project",
+         url: "task-manager/projects",
          icon: "ai-innovation-01-solid-rounded",
       },
       {
          name: "Reports",
          url: "#",
          icon: "apple-stocks-solid-rounded",
+      },
+      {
+         name: "Chats",
+         url: "#",
+         icon: "bubble-chat-solid-rounded",
       },
       {
          name: "Word Assistant",
@@ -158,7 +158,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
          </SidebarHeader>
          <SidebarContent>
             <NavMain items={data.navMain} />
-            <NavDocuments items={data.documents} />
+            <NavTaskManager items={data.documents} />
             <NavSecondary items={data.navSecondary} />
          </SidebarContent>
          <SidebarFooter>

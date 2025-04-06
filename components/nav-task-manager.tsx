@@ -21,7 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-export function NavDocuments({
+export function NavTaskManager({
   items,
 }: {
   items: {
@@ -41,7 +41,7 @@ export function NavDocuments({
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="font-semibold text-muted-foreground">Documents</SidebarGroupLabel>
+      <SidebarGroupLabel className="font-semibold text-muted-foreground">Task Manager</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.name} className="group relative my-1 overflow-hidden">
