@@ -1,6 +1,9 @@
+'use client';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { CreateWorkspacePopover } from "@/components/form/create-workspace";
 
 export function SiteHeader() {
    return (
@@ -13,9 +16,14 @@ export function SiteHeader() {
             />
             <h1 className="text-base font-medium">Workspace</h1>
             <div className="ml-auto flex items-center gap-2">
-               <Button variant="outline" size="sm">
-                  New Workspace
-               </Button>
+               <CreateWorkspacePopover onWorkspaceCreated={() => {
+                  // Refresh page after creating workspace
+                  window.location.reload();
+               }}>
+                  <Button variant="outline" size="sm">
+                     New Workspace
+                  </Button>
+               </CreateWorkspacePopover>
             </div>
          </div>
       </header>
