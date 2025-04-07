@@ -111,6 +111,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs"
+import { CreateTaskPopover } from '@/components/form/create-task';
 
 export const schema = z.object({
   id: z.number(),
@@ -499,17 +500,10 @@ function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof
   const columnStyle = getColumnStyle(status);
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className={`flex items-center justify-between p-2 rounded-lg ${columnStyle.headerBg} ${columnStyle.borderColor} border`}>
-        <div className="flex items-center gap-2">
-          <div className={`${columnStyle.color} ${columnStyle.bgColor} p-1.5 rounded-full`}>
-            {columnStyle.icon}
-          </div>
-          <h3 className="font-medium">{status}</h3>
-        </div>
-        <Badge variant="secondary" className={`${columnStyle.color} ${columnStyle.bgColor} border-0`}>
-          {items.length}
-        </Badge>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium">{status}</h3>
+        <span className="text-sm text-muted-foreground">{items.length}</span>
       </div>
       <div 
         ref={setNodeRef} 
@@ -526,10 +520,12 @@ function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof
               <path d="M16 4.02002C19.33 4.20002 21 5.43002 21 10V16C21 20 20 22 15 22H9C4 22 3 20 3 16V10C3 5.44002 4.67 4.20002 8 4.02002" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
             <p>No tasks</p>
-            <Button variant="outline" size="sm" className="mt-2">
-              <IconPlus className="h-3 w-3 mr-1" />
-              Add task
-            </Button>
+            <CreateTaskPopover>
+              <Button variant="outline" size="sm" className="mt-2">
+                <IconPlus className="h-3 w-3 mr-1" />
+                New task
+              </Button>
+            </CreateTaskPopover>
           </div>
         ) : (
           items.map((item) => (
@@ -871,10 +867,12 @@ export function DataTable({
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-xl font-semibold">Kanban Board</h2>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <IconPlus className="h-4 w-4 mr-1" />
-              Add Task
-            </Button>
+            <CreateTaskPopover>
+              <Button variant="outline" size="sm">
+                <IconPlus className="h-4 w-4 mr-1" />
+                Add Task
+              </Button>
+            </CreateTaskPopover>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">

@@ -9,6 +9,7 @@ import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { Button } from "@/components/ui/button";
 import { deslugifyProjectName } from '@/lib/utils';
 import { DataTable } from '@/components/data-table';
+import { CreateTaskPopover } from '@/components/form/create-task';
 import data from '../data.json';
 
 export default function Project() {
@@ -62,9 +63,16 @@ export default function Project() {
           title={`PROJECT • ${projectName}`}
           showNewWorkspace={false}
           rightContent={
-            <Button variant="outline" size="sm" onClick={handleBackToProjects}>
-              Back to Projects
-            </Button>
+            <div className="flex items-center gap-2">
+              <CreateTaskPopover>
+                <Button variant="outline" size="sm">
+                  New Task
+                </Button>
+              </CreateTaskPopover>
+              <Button variant="outline" size="sm" onClick={handleBackToProjects}>
+                Back to Projects
+              </Button>
+            </div>
           }
         />
         <div className="flex flex-1 flex-col">
