@@ -105,7 +105,7 @@ const data = {
    documents: [
       {
          name: "Project",
-         url: "task-manager/projects",
+         url: "/task-manager",
          icon: "ai-innovation-01-solid-rounded",
       },
       {

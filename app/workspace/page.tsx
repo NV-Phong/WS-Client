@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Icon } from "@/components/ui-engineer/Icon";
 import {
    DropdownMenu,
@@ -23,6 +22,8 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/contexts/toast-context";
+import Cookies from "js-cookie";
+import { slugifyProjectName } from "@/lib/utils";
 
 export default function WorkSpace() {
    const { workspaces, isLoading, error } = useGetWorkspaces();
@@ -131,16 +132,18 @@ export default function WorkSpace() {
                                              </div>
                                           </div>
                                           <div className="mt-auto pt-4 border-t">
-                                             <Link
-                                                href={`/workspace/${workspace.IDWorkspace}`}
+                                             <Button
+                                                className="w-full"
+                                                variant="outline"
+                                                onClick={() => {
+                                                   Cookies.set("IDWorkspace", workspace.IDWorkspace);
+                                                   Cookies.set("WorkSpaceName", workspace.WorkSpaceName);
+                                                   const slugifiedName = slugifyProjectName(workspace.WorkSpaceName);
+                                                   window.location.href = `/workspace/${slugifiedName}`;
+                                                }}
                                              >
-                                                <Button
-                                                   className="w-full"
-                                                   variant="outline"
-                                                >
-                                                   Open
-                                                </Button>
-                                             </Link>
+                                                Open
+                                             </Button>
                                           </div>
                                        </CardContent>
                                     </Card>

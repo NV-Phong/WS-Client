@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Icon } from "@/components/ui-engineer/Icon";
 import {
    DropdownMenu,
@@ -23,6 +22,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Cookies from "js-cookie";
+import { slugifyProjectName } from '@/lib/utils';
 
 export default function ListProject() {
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -134,16 +134,18 @@ export default function ListProject() {
                               </div>
                             </div>
                             <div className="mt-auto pt-4 border-t">
-                              <Link
-                                href={`/task-manager/projects/${project.IDProject}`}
+                              <Button
+                                className="w-full"
+                                variant="outline"
+                                onClick={() => {
+                                  Cookies.set("IDProject", project.IDProject);
+                                  Cookies.set("ProjectName", project.ProjectName);
+                                  const slugifiedName = slugifyProjectName(project.ProjectName);
+                                  window.location.href = `/task-manager/${slugifiedName}`;
+                                }}
                               >
-                                <Button
-                                  className="w-full"
-                                  variant="outline"
-                                >
-                                  Open
-                                </Button>
-                              </Link>
+                                Open
+                              </Button>
                             </div>
                           </CardContent>
                         </Card>
