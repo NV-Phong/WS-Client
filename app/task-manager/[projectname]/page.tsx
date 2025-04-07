@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { AppSidebar } from '@/components/app-sidebar';
@@ -17,18 +17,26 @@ export default function Project() {
   const [projectId, setProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState<string>("");
   const slugifiedName = params.projectname as string;
+  const isInitialized = useRef(false);
 
   useEffect(() => {
-    const storedProjectId = Cookies.get("IDProject");
-    const storedProjectName = Cookies.get("ProjectName");
-    if (storedProjectId) {
-      setProjectId(storedProjectId);
-    }
-    if (storedProjectName) {
-      setProjectName(storedProjectName);
-    } else {
-      // Fallback to deslugify if cookie is not available
-      setProjectName(deslugifyProjectName(slugifiedName));
+    // Chỉ chạy một lần khi component mount
+    if (!isInitialized.current) {
+      const storedProjectId = Cookies.get("IDProject");
+      const storedProjectName = Cookies.get("ProjectName");
+      
+      if (storedProjectId) {
+        setProjectId(storedProjectId);
+      }
+      
+      if (storedProjectName) {
+        setProjectName(storedProjectName);
+      } else {
+        // Fallback to deslugify if cookie is not available
+        setProjectName(deslugifyProjectName(slugifiedName));
+      }
+      
+      isInitialized.current = true;
     }
   }, [slugifiedName]);
 
