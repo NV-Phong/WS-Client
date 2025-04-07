@@ -16,7 +16,6 @@ import {
    SidebarMenuItem,
    useSidebar,
 } from "@/components/ui/sidebar";
-import { useRouter } from "next/navigation";
 import { CreateTeamPopover } from "./form/create-team";
 import { Button } from "./ui/button";
 
@@ -39,7 +38,6 @@ export function TeamSwitcher({
       plan: string;
       idteam: string;
    } | null>(null);
-   const router = useRouter();
 
    // Khi component được mount, lấy thông tin team từ Cookies
    React.useEffect(() => {
@@ -77,9 +75,8 @@ export function TeamSwitcher({
          sameSite: "strict"
       });
 
-      // Chuyển hướng đến trang collection của team
-      const formattedName = team.name.toLowerCase().replace(/\s+/g, "-");
-      router.push(`/dashboard/collection/${formattedName}`);
+      // Reload trang để cập nhật dữ liệu với team mới
+      window.location.reload();
    };
 
    if (isLoading) {

@@ -11,8 +11,14 @@ import {
   useSensors,
   type DragEndEvent,
   type UniqueIdentifier,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  DragStartEvent,
+  defaultDropAnimation,
+  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+import { restrictToVerticalAxis, restrictToWindowEdges } from "@dnd-kit/modifiers"
 import {
   SortableContext,
   arrayMove,
@@ -336,6 +342,96 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
   )
 }
 
+// Thêm component KanbanCard
+function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; isDraggingOver?: boolean }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: item.id,
+  })
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`rounded-lg border bg-card p-4 shadow-sm transition-all duration-200 ${
+        isDragging ? 'opacity-50 scale-105 shadow-lg' : ''
+      } ${isDraggingOver ? 'border-[var(--selection)]' : ''}`}
+    >
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <h4 className="font-medium">{item.header}</h4>
+          <p className="text-sm text-muted-foreground">
+            {item.type}
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-8 w-8 p-0"
+            >
+              <IconDotsVertical className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Make a copy</DropdownMenuItem>
+            <DropdownMenuItem>Favorite</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="mt-4 flex items-center gap-2">
+        <Badge variant="outline" className="text-muted-foreground">
+          Target: {item.target}
+        </Badge>
+        <Badge variant="outline" className="text-muted-foreground">
+          Limit: {item.limit}
+        </Badge>
+      </div>
+    </div>
+  )
+}
+
+// Thêm component KanbanColumn
+function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof schema>[] }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: status,
+  })
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-medium">{status}</h3>
+        <Badge variant="secondary">{items.length}</Badge>
+      </div>
+      <div 
+        ref={setNodeRef} 
+        className={`flex flex-col gap-2 min-h-[200px] p-2 rounded-lg transition-colors duration-200 ${
+          isOver ? 'bg-[var(--selection)]/10' : 'bg-muted/50'
+        }`}
+      >
+        {items.map((item) => (
+          <KanbanCard 
+            key={item.id} 
+            item={item} 
+            isDraggingOver={isOver}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function DataTable({
   data: initialData,
 }: {
@@ -354,11 +450,21 @@ export function DataTable({
     pageSize: 10,
   })
   const sortableId = React.useId()
-  const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {})
-  )
+  
+  // Cấu hình cảm biến kéo thả
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5, // Khoảng cách tối thiểu để bắt đầu kéo
+    },
+  })
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250, // Độ trễ để bắt đầu kéo trên thiết bị cảm ứng
+      tolerance: 5, // Khoảng cách tối thiểu để bắt đầu kéo
+    },
+  })
+  const keyboardSensor = useSensor(KeyboardSensor)
+  const sensors: ReturnType<typeof useSensors> = useSensors(mouseSensor, touchSensor, keyboardSensor)
 
   const dataIds = React.useMemo<UniqueIdentifier[]>(
     () => data?.map(({ id }) => id) || [],
@@ -390,27 +496,72 @@ export function DataTable({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
-      })
-    }
+  const [activeId, setActiveId] = React.useState<UniqueIdentifier | null>(null)
+  const [isDragging, setIsDragging] = React.useState(false)
+  const [isUpdating, setIsUpdating] = React.useState(false)
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id)
+    setIsDragging(true)
   }
+
+  const handleDragEnd = React.useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+    if (active && over && active.id !== over.id && !isUpdating) {
+      setIsUpdating(true)
+      
+      if (typeof over.id === 'string' && ['To Do', 'In Progress', 'In Review', 'Done'].includes(over.id)) {
+        // Cập nhật status khi kéo vào cột mới
+        const newStatus = over.id as string;
+        setData((prevData) =>
+          prevData.map((item) =>
+            item.id === active.id ? { ...item, status: newStatus } : item
+          )
+        )
+      } else {
+        // Sắp xếp lại thứ tự trong cùng một cột
+        setData((prevData) => {
+          const oldIndex = dataIds.indexOf(active.id)
+          const newIndex = dataIds.indexOf(over.id)
+          return arrayMove(prevData, oldIndex, newIndex)
+        })
+      }
+      
+      // Reset trạng thái sau khi cập nhật
+      setTimeout(() => {
+        setIsUpdating(false)
+      }, 100)
+    }
+    
+    setActiveId(null)
+    setIsDragging(false)
+  }, [dataIds, isUpdating])
+
+  // Cấu hình hiệu ứng thả
+  const dropAnimation = {
+    ...defaultDropAnimation,
+    sideEffects: defaultDropAnimationSideEffects({
+      styles: {
+        active: {
+          opacity: '0.5',
+        },
+      },
+    }),
+  }
+
+  // Sử dụng isDragging để thêm class cho container
+  const containerClassName = isDragging ? 'cursor-grabbing' : 'cursor-default';
 
   return (
     <Tabs
-      defaultValue="outline"
-      className="w-full flex-col justify-start gap-6"
+      defaultValue="list"
+      className={`w-full flex-col justify-start gap-6 ${containerClassName}`}
     >
       <div className="flex items-center justify-between px-4 lg:px-6">
         <Label htmlFor="view-selector" className="sr-only">
           View
         </Label>
-        <Select defaultValue="outline">
+        <Select defaultValue="list">
           <SelectTrigger
             className="flex w-fit @4xl/main:hidden"
             size="sm"
@@ -419,21 +570,13 @@ export function DataTable({
             <SelectValue placeholder="Select a view" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="outline">Outline</SelectItem>
-            <SelectItem value="past-performance">Past Performance</SelectItem>
-            <SelectItem value="key-personnel">Key Personnel</SelectItem>
-            <SelectItem value="focus-documents">Focus Documents</SelectItem>
+            <SelectItem value="list">List</SelectItem>
+            <SelectItem value="kanban">Kanban Board</SelectItem>
           </SelectContent>
         </Select>
         <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="outline">Outline</TabsTrigger>
-          <TabsTrigger value="past-performance">
-            Past Performance <Badge variant="secondary">3</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="key-personnel">
-            Key Personnel <Badge variant="secondary">2</Badge>
-          </TabsTrigger>
-          <TabsTrigger value="focus-documents">Focus Documents</TabsTrigger>
+          <TabsTrigger value="list">List</TabsTrigger>
+          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
         </TabsList>
         <div className="flex items-center gap-2">
           <DropdownMenu>
@@ -476,7 +619,7 @@ export function DataTable({
         </div>
       </div>
       <TabsContent
-        value="outline"
+        value="list"
         className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
       >
         <div className="overflow-hidden rounded-lg border">
@@ -609,19 +752,34 @@ export function DataTable({
         </div>
       </TabsContent>
       <TabsContent
-        value="past-performance"
-        className="flex flex-col px-4 lg:px-6"
+        value="kanban"
+        className="flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent
-        value="focus-documents"
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          modifiers={[restrictToWindowEdges]}
+          autoScroll={true}
+        >
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {["To Do", "In Progress", "In Review", "Done"].map((status) => (
+              <KanbanColumn
+                key={status}
+                status={status}
+                items={data.filter((item) => item.status === status)}
+              />
+            ))}
+          </div>
+          <DragOverlay dropAnimation={dropAnimation}>
+            {activeId ? (
+              <KanbanCard
+                item={data.find((item) => item.id === activeId)!}
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
       </TabsContent>
     </Tabs>
   )

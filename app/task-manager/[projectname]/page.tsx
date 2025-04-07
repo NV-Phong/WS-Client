@@ -6,9 +6,10 @@ import Cookies from 'js-cookie';
 import { AppSidebar } from '@/components/app-sidebar';
 import { SiteHeader } from '@/components/site-header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { deslugifyProjectName } from '@/lib/utils';
+import { DataTable } from '@/components/data-table';
+import data from '../data.json';
 
 export default function Project() {
   const params = useParams();
@@ -35,6 +36,9 @@ export default function Project() {
     router.push('/task-manager');
   };
 
+  // Sử dụng projectId để tạo một key duy nhất cho DataTable
+  const tableKey = projectId ? `project-${projectId}` : 'default-project';
+
   return (
     <SidebarProvider
       style={
@@ -59,22 +63,7 @@ export default function Project() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-                {!projectId ? (
-                  <div className="text-center py-8">
-                    <p className="text-muted-foreground">Không tìm thấy thông tin dự án</p>
-                  </div>
-                ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Project ID: {projectId}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>Project Name: {projectName}</p>
-                      <p>Project ID from Cookie: {projectId}</p>
-                      <p>URL Slug: {slugifiedName}</p>
-                    </CardContent>
-                  </Card>
-                )}
+              <DataTable key={tableKey} data={data} />
               </div>
             </div>
           </div>

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Cookies from "js-cookie";
 import { slugifyProjectName } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function ListProject() {
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -134,18 +135,18 @@ export default function ListProject() {
                               </div>
                             </div>
                             <div className="mt-auto pt-4 border-t">
-                              <Button
-                                className="w-full"
-                                variant="outline"
-                                onClick={() => {
-                                  Cookies.set("IDProject", project.IDProject);
-                                  Cookies.set("ProjectName", project.ProjectName);
-                                  const slugifiedName = slugifyProjectName(project.ProjectName);
-                                  window.location.href = `/task-manager/${slugifiedName}`;
-                                }}
-                              >
-                                Open
-                              </Button>
+                              <Link href={`/task-manager/${slugifyProjectName(project.ProjectName)}`}>
+                                <Button
+                                  className="w-full"
+                                  variant="outline"
+                                  onClick={() => {
+                                    Cookies.set("IDProject", project.IDProject);
+                                    Cookies.set("ProjectName", project.ProjectName);
+                                  }}
+                                >
+                                  Open
+                                </Button>
+                              </Link>
                             </div>
                           </CardContent>
                         </Card>

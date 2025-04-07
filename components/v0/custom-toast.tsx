@@ -42,7 +42,7 @@ export function Toast({ state: initialState, onReset, onSave }: ToastProps) {
   const [state, setState] = React.useState(initialState)
 
   React.useEffect(() => {
-    if (initialState === "loading") {
+    if (initialState === "loading" && state !== "loading") {
       setState("loading")
       const timer = setTimeout(() => {
         setState("success")
@@ -52,10 +52,10 @@ export function Toast({ state: initialState, onReset, onSave }: ToastProps) {
         return () => clearTimeout(successTimer)
       }, 3000)
       return () => clearTimeout(timer)
-    } else {
+    } else if (initialState !== state) {
       setState(initialState)
     }
-  }, [initialState])
+  }, [initialState, state])
 
   const currentState = saveStates[state]
 

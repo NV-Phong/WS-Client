@@ -21,15 +21,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [showToast, setShowToast] = useState(false);
 
   const handleSave = () => {
-    setState("loading");
-    setTimeout(() => {
-      setState("success");
-      setTimeout(() => {
-        setState("initial");
-        setShowToast(false);
-        window.location.reload();
-      }, 2000);
-    }, 1500);
+    if (state === "initial") {
+      setState("loading");
+      const loadingTimer = setTimeout(() => {
+        setState("success");
+        const successTimer = setTimeout(() => {
+          setState("initial");
+          setShowToast(false);
+          window.location.reload();
+        }, 2000);
+        return () => clearTimeout(successTimer);
+      }, 1500);
+      return () => clearTimeout(loadingTimer);
+    }
   };
 
   const handleReset = () => {
