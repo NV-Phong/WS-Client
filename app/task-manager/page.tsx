@@ -24,6 +24,7 @@ import {
 import Cookies from "js-cookie";
 import { slugifyProjectName } from '@/lib/utils';
 import Link from 'next/link';
+import { CreateProjectPopover } from "@/components/form/create-project";
 
 export default function ListProject() {
   const [teamId, setTeamId] = useState<string | null>(null);
@@ -52,9 +53,11 @@ export default function ListProject() {
           title="Task Manager"
           showNewWorkspace={false}
           rightContent={
-            <Button variant="outline" size="sm">
-              New Project
-            </Button>
+            <CreateProjectPopover onProjectCreated={() => window.location.reload()}>
+              <Button variant="outline" size="sm">
+                New Project
+              </Button>
+            </CreateProjectPopover>
           }
         />
         <div className="flex flex-1 flex-col">

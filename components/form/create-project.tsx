@@ -10,42 +10,51 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createPortal } from "react-dom";
-import { useCreateWorkspace } from "@/hooks/beta/workspace/use-create-workspace";
+import { useCreateProject } from "@/hooks/beta/project/use-create-project";
+import Cookies from "js-cookie";
 
-interface CreateWorkspacePopoverProps {
+interface CreateProjectPopoverProps {
    children: React.ReactNode;
-   onWorkspaceCreated?: () => void;
+   onProjectCreated?: () => void;
 }
 
-export function CreateWorkspacePopover({ children, onWorkspaceCreated }: CreateWorkspacePopoverProps) {
+export function CreateProjectPopover({ children, onProjectCreated }: CreateProjectPopoverProps) {
    const [open, setOpen] = React.useState(false);
-   const [workspaceName, setWorkspaceName] = React.useState("");
-   const [workspaceDescription, setWorkspaceDescription] = React.useState("");
-   const { createWorkspace, isLoading } = useCreateWorkspace();
+   const [projectName, setProjectName] = React.useState("");
+   const [projectDescription, setProjectDescription] = React.useState("");
+   const { createProject, isLoading } = useCreateProject();
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       
+      const idTeam = Cookies.get("IDTeam");
+      if (!idTeam) {
+         console.error("Team ID not found in cookies.");
+         return;
+      }
+
       try {
-         await createWorkspace({
-            workspaceName: workspaceName,
-            workspaceDescription: workspaceDescription
+         await createProject({
+            projectName: projectName,
+            projectDescription: projectDescription,
+            idTeam: idTeam,
+            access: [] // Assuming empty access for now
          });
          
          // Reset form
-         setWorkspaceName("");
-         setWorkspaceDescription("");
+         setProjectName("");
+         setProjectDescription("");
          
          // Close popover
          setOpen(false);
          
          // Callback if provided
-         if (onWorkspaceCreated) {
-            onWorkspaceCreated();
+         if (onProjectCreated) {
+            onProjectCreated();
          }
       } catch (error) {
          // Error is already handled by the hook
-         console.error("Failed to create workspace:", error);
+         console.error("Failed to create project:", error);
       }
    };
 
@@ -71,9 +80,9 @@ export function CreateWorkspacePopover({ children, onWorkspaceCreated }: CreateW
             >
                <form onSubmit={handleSubmit} className="grid gap-4">
                   <div className="space-y-2">
-                     <h4 className="font-medium leading-none">CREATE NEW WORKSPACE</h4>
+                     <h4 className="font-medium leading-none">CREATE NEW PROJECT</h4>
                      <p className="text-sm text-muted-foreground">
-                        Create a new workspace to manage your notes and schedule.
+                        Create a new project to manage your tasks and goals.
                      </p>
                   </div>
                   <div className="grid gap-3">
@@ -81,20 +90,20 @@ export function CreateWorkspacePopover({ children, onWorkspaceCreated }: CreateW
                         <Label htmlFor="name" className="pb-1">Name</Label>
                         <Input
                            id="name"
-                           value={workspaceName}
-                           onChange={(e) => setWorkspaceName(e.target.value)}
-                           placeholder="Workspace Name"
+                           value={projectName}
+                           onChange={(e) => setProjectName(e.target.value)}
+                           placeholder="Project Name"
                            required
                            disabled={isLoading}
                         />
                      </div>
                      <div className="items-center gap-4">
-                        <Label htmlFor="description" className="pb-1">Desciption</Label>
+                        <Label htmlFor="description" className="pb-1">Description</Label>
                         <Textarea
                            id="description"
-                           value={workspaceDescription}
-                           onChange={(e) => setWorkspaceDescription(e.target.value)}
-                           placeholder="Workspace Description"
+                           value={projectDescription}
+                           onChange={(e) => setProjectDescription(e.target.value)}
+                           placeholder="Project Description"
                            disabled={isLoading}
                         />
                      </div>
@@ -122,4 +131,4 @@ export function CreateWorkspacePopover({ children, onWorkspaceCreated }: CreateW
          </Popover>
       </>
    );
-} 
+}
