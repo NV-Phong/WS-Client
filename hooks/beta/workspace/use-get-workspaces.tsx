@@ -5,10 +5,22 @@ import axios from "@/services/api";
 import { showToast } from "@/lib/toast-config";
 
 // Định nghĩa kiểu dữ liệu cho workspace
+interface Access {
+  IDCollaborator: string;
+  permission: string;
+  isDeleted: boolean;
+}
+
 interface Workspace {
-  IDWorkspace: string;
-  WorkSpaceName: string;
-  WorkSpaceDescription: string;
+  _id: string;
+  owner: string;
+  workspaceName: string;
+  workspaceDescription: string;
+  isDeleted: boolean;
+  access: Access[];
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 }
 
 interface WorkspaceResponse {
@@ -48,4 +60,4 @@ export function useGetWorkspaces() {
     isLoading,
     error
   };
-} 
+}

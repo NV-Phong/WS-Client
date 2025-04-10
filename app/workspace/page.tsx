@@ -81,7 +81,7 @@ export default function WorkSpace() {
                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                               {workspaces.map((workspace) => (
                                  <div
-                                    key={workspace.IDWorkspace}
+                                    key={workspace._id}
                                     className="aspect-square"
                                  >
                                     <Card className="h-full flex flex-col p-6 gap-0 relative">
@@ -107,7 +107,7 @@ export default function WorkSpace() {
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem 
                                                    className="text-red-600"
-                                                   onClick={() => handleDeleteWorkspace(workspace.IDWorkspace)}
+                                                   onClick={() => handleDeleteWorkspace(workspace._id)}
                                                    disabled={isDeleting}
                                                 >
                                                    {isDeleting ? "Đang xóa..." : "Remove"}
@@ -117,7 +117,7 @@ export default function WorkSpace() {
                                        </div>
                                        <CardHeader className="flex-none p-0 space-y-1.5 bg-gradient-to-r from-primary to-transparent bg-clip-text text-transparent">
                                           <CardTitle className="text-xl font-semibold">
-                                             {workspace.WorkSpaceName}
+                                             {workspace.workspaceName}
                                           </CardTitle>
                                        </CardHeader>
                                        <CardContent className="flex flex-col flex-1 p-0">
@@ -127,7 +127,7 @@ export default function WorkSpace() {
                                              </CardDescription>
                                              <div className="mt-2 h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2">
                                                 <p className="text-sm text-muted-foreground">
-                                                   {workspace.WorkSpaceDescription}
+                                                   {workspace.workspaceDescription}
                                                 </p>
                                              </div>
                                           </div>
@@ -136,9 +136,9 @@ export default function WorkSpace() {
                                                 className="w-full"
                                                 variant="outline"
                                                 onClick={() => {
-                                                   Cookies.set("IDWorkspace", workspace.IDWorkspace);
-                                                   Cookies.set("WorkSpaceName", workspace.WorkSpaceName);
-                                                   const slugifiedName = slugifyProjectName(workspace.WorkSpaceName);
+                                                   Cookies.set("IDWorkspace", workspace._id);
+                                                   Cookies.set("WorkSpaceName", workspace.workspaceName);
+                                                   const slugifiedName = slugifyProjectName(workspace.workspaceName);
                                                    window.location.href = `/workspace/${slugifiedName}`;
                                                 }}
                                              >
