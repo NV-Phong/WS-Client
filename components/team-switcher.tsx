@@ -1,6 +1,6 @@
 import * as React from "react";
 import Cookies from "js-cookie"; // Thêm import js-cookie
-import { ChevronsUpDown, Loader2 } from "lucide-react";
+import { ChevronsUpDown, Loader2, User } from "lucide-react"; // Added default icon
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -60,21 +60,19 @@ export function TeamSwitcher({
    }) => {
       setActiveTeam(team);
       // Lưu IDTeam vào cookie với thời hạn 7 ngày
-      Cookies.set("IDTeam", team.idteam, { 
+      Cookies.set("IDTeam", team.idteam, {
          expires: 7,
          path: "/",
          secure: true,
-         sameSite: "strict"
+         sameSite: "strict",
       });
-
       // Lưu thêm thông tin team name để dễ dàng hiển thị
       Cookies.set("TeamName", team.name, {
          expires: 7,
          path: "/",
          secure: true,
-         sameSite: "strict"
+         sameSite: "strict",
       });
-
       // Reload trang để cập nhật dữ liệu với team mới
       window.location.reload();
    };
@@ -150,12 +148,13 @@ export function TeamSwitcher({
                      ))
                   )}
                   <DropdownMenuSeparator />
-
                   <div className="p-2">
-                     <CreateTeamPopover onTeamCreated={() => {
-                        // Refresh teams list
-                        window.location.reload();
-                     }}>
+                     <CreateTeamPopover
+                        onTeamCreated={() => {
+                           // Refresh teams list
+                           window.location.reload();
+                        }}
+                     >
                         <Button className="w-full">Create New Team</Button>
                      </CreateTeamPopover>
                   </div>
@@ -164,4 +163,4 @@ export function TeamSwitcher({
          </SidebarMenuItem>
       </SidebarMenu>
    );
-} 
+}

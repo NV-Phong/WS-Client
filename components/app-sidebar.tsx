@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/sidebar";
 import { TeamSwitcher } from "@/components/team-switcher";
 import { Users } from "lucide-react";
-import { useGetTeams } from "@/hooks/team/use-get-teams";
+import { useGetTeams } from "@/hooks/beta/team/use-get-teams";
 
 const data = {
    user: {
@@ -130,10 +130,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
    const { teams } = useGetTeams();
    
    const formattedTeams = teams.map(team => ({
-      name: team.TeamName,
+      name: team.teamName,
       logo: Users,
-      plan: team.TeamDescription,
-      idteam: team.IDTeam
+      plan: team.teamDescription,
+      idteam: team._id
    }));
 
    return (

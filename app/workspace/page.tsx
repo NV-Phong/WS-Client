@@ -3,8 +3,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { useGetWorkspaces } from "@/hooks/workspace/use-get-workspaces";
-import { useDeleteWorkspace } from "@/hooks/workspace/use-delete-workspace";
+import { useGetWorkspaces } from "@/hooks/beta/workspace/use-get-workspaces";
+import { useDeleteWorkspace } from "@/hooks/beta/workspace/use-delete-workspace";
 import {
    Card,
    CardContent,

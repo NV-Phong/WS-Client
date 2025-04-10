@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
  * @param name Tên project cần chuyển đổi
  * @returns Tên project đã được chuyển đổi thành định dạng URL-friendly
  */
-export function slugifyProjectName(name: string): string {
+export function slugifyProjectName(name: string = ''): string {
   // Chuyển đổi các ký tự tiếng Việt thành không dấu
   const withoutAccents = name
     .normalize('NFD')

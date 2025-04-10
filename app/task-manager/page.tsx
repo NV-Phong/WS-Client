@@ -4,7 +4,7 @@ import { AppSidebar } from '@/components/app-sidebar'
 import { SiteHeader } from '@/components/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import React, { useEffect, useState } from 'react'
-import { useGetProjects } from '@/hooks/project/use-get-projects'
+import { useGetProjects } from '@/hooks/beta/project/use-get-projects'
 import {
    Card,
    CardContent,
@@ -87,7 +87,7 @@ export default function ListProject() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {projects.map((project) => (
                       <div
-                        key={project.IDProject}
+                        key={project._id}
                         className="aspect-square"
                       >
                         <Card className="h-full flex flex-col p-6 gap-0 relative">
@@ -120,7 +120,7 @@ export default function ListProject() {
                           </div>
                           <CardHeader className="flex-none p-0 space-y-1.5 bg-gradient-to-r from-primary to-transparent bg-clip-text text-transparent">
                             <CardTitle className="text-xl font-semibold">
-                              {project.ProjectName}
+                              {project.projectName}
                             </CardTitle>
                           </CardHeader>
                           <CardContent className="flex flex-col flex-1 p-0">
@@ -130,18 +130,18 @@ export default function ListProject() {
                               </CardDescription>
                               <div className="mt-2 h-[180px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pr-2">
                                 <p className="text-sm text-muted-foreground">
-                                  {project.ProjectDescription}
+                                  {project.projectDescription}
                                 </p>
                               </div>
                             </div>
                             <div className="mt-auto pt-4 border-t">
-                              <Link href={`/task-manager/${slugifyProjectName(project.ProjectName)}`}>
+                              <Link href={`/task-manager/${slugifyProjectName(project.projectName)}`}>
                                 <Button
                                   className="w-full"
                                   variant="outline"
                                   onClick={() => {
-                                    Cookies.set("IDProject", project.IDProject);
-                                    Cookies.set("ProjectName", project.ProjectName);
+                                    Cookies.set("IDProject", project._id);
+                                    Cookies.set("ProjectName", project.projectName);
                                   }}
                                 >
                                   Open

@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/auth/use-auth";
-import { useLogin } from "@/hooks/auth/use-login";
+import { useAuth } from "@/hooks/beta/auth/use-auth";
+import { useLogin } from "@/hooks/beta/auth/use-login";
 import { TabsContent } from "@radix-ui/react-tabs";
 import React from "react";
 
