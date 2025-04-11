@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { deslugifyProjectName } from '@/lib/utils';
 import { DataTable } from '@/components/data-table';
 import { CreateTaskPopover } from '@/components/form/create-task';
-import data from '../data.json';
+import { useGetTasks } from '@/hooks/beta/task/use-get-list-task';
 
 export default function Project() {
   const params = useParams();
@@ -40,6 +40,8 @@ export default function Project() {
       isInitialized.current = true;
     }
   }, [slugifiedName]);
+
+  const { tasks, isLoading, error } = useGetTasks(projectId || "");
 
   const handleBackToProjects = () => {
     router.push('/task-manager');
@@ -79,7 +81,13 @@ export default function Project() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-              <DataTable key={tableKey} data={data} />
+                {isLoading ? (
+                  <p>Loading tasks...</p>
+                ) : error ? (
+                  <p className="text-red-500">{error}</p>
+                ) : (
+                  <DataTable key={tableKey} data={tasks} />
+                )}
               </div>
             </div>
           </div>

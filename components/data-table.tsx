@@ -113,14 +113,37 @@ import {
 } from "@/components/ui/tabs"
 import { CreateTaskPopover } from '@/components/form/create-task';
 
+interface Tag {
+  tagName: string;
+  isDeleted: boolean;
+  _id: string;
+  idTag: string;
+}
+
+interface Task {
+  _id: string;
+  idProject: string;
+  idAssignee: string;
+  status: string;
+  tag: Tag[]; 
+  taskName: string;
+  priority: string;
+  startDay: string;
+  endDay: string;
+  dueDay: string;
+  isDeleted: boolean;
+  createAt: string;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
 export const schema = z.object({
   id: z.number(),
   header: z.string(),
   type: z.string(),
   status: z.string(),
   target: z.string(),
-  limit: z.string(),
-  reviewer: z.string(),
 })
 
 // Create a separate component for the drag handle
@@ -177,7 +200,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "header",
-    header: "Header",
+    header: "Task",
     cell: ({ row }) => {
       return <TableCellViewer item={row.original} />
     },
@@ -185,7 +208,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "type",
-    header: "Section Type",
+    header: "Tag",
     cell: ({ row }) => (
       <div className="w-32">
         <Badge variant="outline" className="text-muted-foreground px-1.5">
@@ -210,7 +233,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
   },
   {
     accessorKey: "target",
-    header: () => <div className="w-full text-right">Target</div>,
+    header: () => <div className="w-full text-right">Priority</div>,
     cell: ({ row }) => (
       <form
         onSubmit={(e) => {
@@ -223,7 +246,7 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
         }}
       >
         <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
+          Priority
         </Label>
         <Input
           className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
@@ -231,89 +254,6 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
           id={`${row.original.id}-target`}
         />
       </form>
-    ),
-  },
-  {
-    accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          })
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "reviewer",
-    header: "Reviewer",
-    cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer"
-
-      if (isAssigned) {
-        return row.original.reviewer
-      }
-
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </>
-      )
-    },
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuItem>Favorite</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
     ),
   },
 ]
@@ -351,6 +291,7 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
 
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+
   } : undefined
 
   // Xác định màu dựa trên loại
@@ -424,19 +365,6 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
             <IconTrendingUp className="h-3 w-3" />
             <span>Target: {item.target}</span>
           </div>
-          <div className="flex items-center gap-1">
-            <IconGripVertical className="h-3 w-3" />
-            <span>Limit: {item.limit}</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-xs">
-          <div className="flex items-center gap-1 text-muted-foreground">
-            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>{item.reviewer === "Assign reviewer" ? "Unassigned" : item.reviewer}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -447,7 +375,7 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
 function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof schema>[] }) {
   const { setNodeRef, isOver } = useDroppable({
     id: status,
-  })
+  });
 
   const getColumnStyle = (status: string) => {
     switch (status) {
@@ -456,43 +384,30 @@ function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof
           color: "text-gray-400",
           bgColor: "bg-gray-50 dark:bg-gray-800/20",
           borderColor: "border-gray-100 dark:border-gray-700",
-          icon: <IconLayoutColumns className="h-4 w-4" />,
-          headerBg: "bg-gray-100/50 dark:bg-gray-800/40"
         };
       case "In Progress":
         return {
           color: "text-blue-400",
           bgColor: "bg-blue-50 dark:bg-blue-900/10",
           borderColor: "border-blue-100 dark:border-blue-800",
-          icon: <IconLoader className="h-4 w-4 animate-spin" />,
-          headerBg: "bg-blue-100/50 dark:bg-blue-900/20"
         };
       case "In Review":
         return {
           color: "text-amber-400",
           bgColor: "bg-amber-50 dark:bg-amber-900/10",
           borderColor: "border-amber-100 dark:border-amber-800",
-          icon: <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2.45801 14.02C2.71201 13.44 2.83901 13.15 2.97101 12.87C3.54101 11.55 3.82601 10.89 3.97101 10.21C4.13901 9.42 4.13901 8.58 3.97101 7.79C3.82601 7.11 3.54101 6.45 2.97101 5.13C2.83901 4.85 2.71201 4.56 2.45801 3.98C2.13901 3.27 1.97901 2.91 1.83901 2.77C1.69901 2.63 1.33901 2.47 0.629013 2.15L0.359013 2C0.129013 1.88 0.0140132 1.82 0.0140132 1.76C0.0140132 1.7 0.129013 1.64 0.359013 1.52L0.629013 1.37C1.33901 1.05 1.69901 0.89 1.83901 0.75C1.97901 0.61 2.13901 0.45 2.45801 0.74C2.71201 1.32 2.83901 1.61 2.97101 1.89C3.54101 3.21 3.82601 3.87 3.97101 4.55C4.13901 5.34 4.13901 6.18 3.97101 6.97C3.82601 7.65 3.54101 8.31 2.97101 9.63C2.83901 9.91 2.71201 10.2 2.45801 10.78C2.13901 11.49 1.97901 11.85 1.83901 11.99C1.69901 12.13 1.33901 12.29 0.629013 12.61L0.359013 12.76C0.129013 12.88 0.0140132 12.94 0.0140132 13C0.0140132 13.06 0.129013 13.12 0.359013 13.24L0.629013 13.39C1.33901 13.71 1.69901 13.87 1.83901 14.01C1.97901 14.15 2.13901 14.31 2.45801 14.02Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>,
-          headerBg: "bg-amber-100/50 dark:bg-amber-900/20"
         };
       case "Done":
         return {
           color: "text-green-400",
           bgColor: "bg-green-50 dark:bg-green-900/10",
           borderColor: "border-green-100 dark:border-green-800",
-          icon: <IconCircleCheckFilled className="h-4 w-4" />,
-          headerBg: "bg-green-100/50 dark:bg-green-900/20"
         };
       default:
         return {
           color: "text-gray-400",
           bgColor: "bg-gray-50 dark:bg-gray-800/20",
           borderColor: "border-gray-100 dark:border-gray-700",
-          icon: <IconLayoutColumns className="h-4 w-4" />,
-          headerBg: "bg-gray-100/50 dark:bg-gray-800/40"
         };
     }
   };
@@ -505,48 +420,50 @@ function KanbanColumn({ status, items }: { status: string; items: z.infer<typeof
         <h3 className="font-medium">{status}</h3>
         <span className="text-sm text-muted-foreground">{items.length}</span>
       </div>
-      <div 
-        ref={setNodeRef} 
+      <div
+        ref={setNodeRef}
         className={`flex flex-col gap-3 min-h-[300px] max-h-[500px] overflow-y-auto p-3 rounded-lg transition-colors duration-200 border ${columnStyle.borderColor} ${
-          isOver ? 'bg-[var(--selection)]/10 ring-2 ring-[var(--selection)]' : columnStyle.bgColor
+          isOver ? "bg-[var(--selection)]/10 ring-2 ring-[var(--selection)]" : columnStyle.bgColor
         }`}
       >
         {items.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground text-sm gap-2">
-            <svg className="h-8 w-8 opacity-50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 12.2H15" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M8 16.2H12.38" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M10 6H14C16 6 16 5 16 4C16 2 15 2 14 2H10C9 2 8 2 8 4C8 6 9 6 10 6Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M16 4.02002C19.33 4.20002 21 5.43002 21 10V16C21 20 20 22 15 22H9C4 22 3 20 3 16V10C3 5.44002 4.67 4.20002 8 4.02002" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
             <p>No tasks</p>
-            <CreateTaskPopover>
-              <Button variant="outline" size="sm" className="mt-2">
-                <IconPlus className="h-3 w-3 mr-1" />
-                New task
-              </Button>
-            </CreateTaskPopover>
           </div>
         ) : (
           items.map((item) => (
-            <KanbanCard 
-              key={item.id} 
-              item={item} 
-              isDraggingOver={isOver}
-            />
+            <KanbanCard key={item.id} item={item} isDraggingOver={isOver} />
           ))
         )}
       </div>
     </div>
-  )
+  );
+}
+
+interface TableRowData {
+  header: string;
+  id: number;
+  type: string;
+  status: string;
+  target: string;
 }
 
 export function DataTable({
-  data: initialData,
+  data: tasks,
 }: {
-  data: z.infer<typeof schema>[]
+  data: Task[];
 }) {
-  const [data, setData] = React.useState(() => initialData)
+  const [data, setData] = React.useState<TableRowData[]>(() => {
+    const statuses = ["To Do", "In Progress", "In Review", "Done"];
+    return tasks.map((task) => ({
+      header: task.taskName,
+      id: parseInt(task._id, 16), // Convert MongoDB ObjectId to a number
+      type: task.tag.length > 0 ? task.tag[0].tagName : "Uncategorized",
+      status: statuses[Math.floor(Math.random() * statuses.length)], // Randomize status for each task
+      target: task.priority,
+    }));
+  });
+
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -662,261 +579,186 @@ export function DataTable({
   const containerClassName = isDragging ? 'cursor-grabbing' : 'cursor-default';
 
   return (
-    <Tabs
-      defaultValue="kanban"
-      className={`w-full flex-col justify-start gap-6 ${containerClassName}`}
-    >
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select defaultValue="list">
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            size="sm"
-            id="view-selector"
-          >
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="list">List</SelectItem>
-            <SelectItem value="kanban">Kanban Board</SelectItem>
-          </SelectContent>
-        </Select>
-        <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
-          <TabsTrigger value="list">List</TabsTrigger>
-        </TabsList>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconLayoutColumns />
-                <span className="hidden lg:inline">Customize Columns</span>
-                <span className="lg:hidden">Columns</span>
-                <IconChevronDown />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              {table
-                .getAllColumns()
-                .filter(
-                  (column) =>
-                    typeof column.accessorFn !== "undefined" &&
-                    column.getCanHide()
-                )
-                .map((column) => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(value) =>
-                        column.toggleVisibility(!!value)
-                      }
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  )
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button variant="outline" size="sm">
-            <IconPlus />
-            <span className="hidden lg:inline">Add Section</span>
-          </Button>
-        </div>
-      </div>
-      <TabsContent
-        value="list"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
+    <div>
+      <Tabs
+        defaultValue="kanban"
+        className={`w-full flex-col justify-start gap-6 ${containerClassName}`}
       >
-        <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          >
-            <Table>
-              <TableHeader className="bg-muted sticky top-0 z-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
-                    ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
-        </div>
-        <div className="flex items-center justify-between px-4">
-          <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
-          </div>
-          <div className="flex w-full items-center gap-8 lg:w-fit">
-            <div className="hidden items-center gap-2 lg:flex">
-              <Label htmlFor="rows-per-page" className="text-sm font-medium">
-                Rows per page
-              </Label>
-              <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
-              >
-                <SelectTrigger size="sm" className="w-20" id="rows-per-page">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
-                </SelectTrigger>
-                <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
-                    <SelectItem key={pageSize} value={`${pageSize}`}>
-                      {pageSize}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex w-fit items-center justify-center text-sm font-medium">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-            </div>
-            <div className="ml-auto flex items-center gap-2 lg:ml-0">
-              <Button
-                variant="outline"
-                className="hidden h-8 w-8 p-0 lg:flex"
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to first page</span>
-                <IconChevronsLeft />
-              </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-              >
-                <span className="sr-only">Go to previous page</span>
-                <IconChevronLeft />
-              </Button>
-              <Button
-                variant="outline"
-                className="size-8"
-                size="icon"
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to next page</span>
-                <IconChevronRight />
-              </Button>
-              <Button
-                variant="outline"
-                className="hidden size-8 lg:flex"
-                size="icon"
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-              >
-                <span className="sr-only">Go to last page</span>
-                <IconChevronsRight />
-              </Button>
-            </div>
-          </div>
-        </div>
-      </TabsContent>
-      <TabsContent
-        value="kanban"
-        className="flex flex-col gap-4 px-4 lg:px-6"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold">Kanban Board</h2>
+        <div className="flex items-center justify-between px-4 lg:px-6">
+          <Label htmlFor="view-selector" className="sr-only">
+            View
+          </Label>
+          <Select defaultValue="list">
+            <SelectTrigger
+              className="flex w-fit @4xl/main:hidden"
+              size="sm"
+              id="view-selector"
+            >
+              <SelectValue placeholder="Select a view" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="list">List</SelectItem>
+              <SelectItem value="kanban">Kanban Board</SelectItem>
+            </SelectContent>
+          </Select>
+          <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
+            <TabsTrigger value="kanban">Kanban Board</TabsTrigger>
+            <TabsTrigger value="list">List</TabsTrigger>
+          </TabsList>
           <div className="flex items-center gap-2">
-            <CreateTaskPopover>
-              <Button variant="outline" size="sm">
-                <IconPlus className="h-4 w-4 mr-1" />
-                Add Task
-              </Button>
-            </CreateTaskPopover>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm">
-                  <IconLayoutColumns className="h-4 w-4 mr-1" />
-                  View Options
+                  <IconLayoutColumns />
+                  <span className="hidden lg:inline">Customize Columns</span>
+                  <span className="lg:hidden">Columns</span>
+                  <IconChevronDown />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Compact View</DropdownMenuItem>
-                <DropdownMenuItem>Detailed View</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Group by Type</DropdownMenuItem>
-                <DropdownMenuItem>Group by Reviewer</DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-56">
+                {table
+                  .getAllColumns()
+                  .filter(
+                    (column) =>
+                      typeof column.accessorFn !== "undefined" &&
+                      column.getCanHide()
+                  )
+                  .map((column) => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={(value) =>
+                          column.toggleVisibility(!!value)
+                        }
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    )
+                  })}
               </DropdownMenuContent>
             </DropdownMenu>
+            <Button variant="outline" size="sm">
+              <IconPlus />
+              <span className="hidden lg:inline">Add Section</span>
+            </Button>
           </div>
         </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToWindowEdges]}
-          autoScroll={true}
+        <TabsContent
+          value="list"
+          className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
         >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {["To Do", "In Progress", "In Review", "Done"].map((status) => (
-              <KanbanColumn
-                key={status}
-                status={status}
-                items={data.filter((item) => item.status === status)}
-              />
-            ))}
+          <div className="overflow-hidden rounded-lg border">
+            <DndContext
+              collisionDetection={closestCenter}
+              modifiers={[restrictToVerticalAxis]}
+              onDragEnd={handleDragEnd}
+              sensors={sensors}
+              id={sortableId}
+            >
+              <Table>
+                <TableHeader className="bg-muted sticky top-0 z-10">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => {
+                        return (
+                          <TableHead key={header.id} colSpan={header.colSpan}>
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )}
+                          </TableHead>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+                </TableHeader>
+                <TableBody className="**:data-[slot=table-cell]:first:w-8">
+                  {table.getRowModel().rows?.length ? (
+                    <SortableContext
+                      items={dataIds}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {table.getRowModel().rows.map((row) => (
+                        <DraggableRow key={row.id} row={row} />
+                      ))}
+                    </SortableContext>
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </DndContext>
           </div>
-          <DragOverlay dropAnimation={dropAnimation}>
-            {activeId ? (
-              <KanbanCard
-                item={data.find((item) => item.id === activeId)!}
-              />
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-      </TabsContent>
-    </Tabs>
+        </TabsContent>
+        <TabsContent
+          value="kanban"
+          className="flex flex-col gap-4 px-4 lg:px-6"
+        >
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xl font-semibold">Kanban Board</h2>
+            <div className="flex items-center gap-2">
+              <CreateTaskPopover>
+                <Button variant="outline" size="sm">
+                  <IconPlus className="h-4 w-4 mr-1" />
+                  Add Task
+                </Button>
+              </CreateTaskPopover>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <IconLayoutColumns className="h-4 w-4 mr-1" />
+                    View Options
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>Compact View</DropdownMenuItem>
+                  <DropdownMenuItem>Detailed View</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Group by Type</DropdownMenuItem>
+                  <DropdownMenuItem>Group by Reviewer</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToWindowEdges]}
+            autoScroll={true}
+          >
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {["To Do", "In Progress", "In Review", "Done"].map((status) => (
+                <KanbanColumn
+                  key={status}
+                  status={status}
+                  items={data.filter((item) => item.status === status)}
+                />
+              ))}
+            </div>
+            <DragOverlay dropAnimation={dropAnimation}>
+              {activeId ? (
+                <KanbanCard
+                  item={data.find((item) => item.id === activeId)!}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }
 
@@ -1066,25 +908,6 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                 <Label htmlFor="target">Target</Label>
                 <Input id="target" defaultValue={item.target} />
               </div>
-              <div className="flex flex-col gap-3">
-                <Label htmlFor="limit">Limit</Label>
-                <Input id="limit" defaultValue={item.limit} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <Label htmlFor="reviewer">Reviewer</Label>
-              <Select defaultValue={item.reviewer}>
-                <SelectTrigger id="reviewer" className="w-full">
-                  <SelectValue placeholder="Select a reviewer" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-                  <SelectItem value="Jamik Tashpulatov">
-                    Jamik Tashpulatov
-                  </SelectItem>
-                  <SelectItem value="Emily Whalen">Emily Whalen</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </form>
         </div>
