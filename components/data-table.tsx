@@ -28,10 +28,6 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import {
   IconChevronDown,
-  IconChevronLeft,
-  IconChevronRight,
-  IconChevronsLeft,
-  IconChevronsRight,
   IconCircleCheckFilled,
   IconDotsVertical,
   IconGripVertical,
@@ -207,17 +203,6 @@ const columns: ColumnDef<z.infer<typeof schema>>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "type",
-    header: "Tag",
-    cell: ({ row }) => (
-      <div className="w-32">
-        <Badge variant="outline" className="text-muted-foreground px-1.5">
-          {row.original.type}
-        </Badge>
-      </div>
-    ),
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
@@ -287,34 +272,13 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; isDraggingOver?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: item.id,
-  })
+  });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-
-  } : undefined
-
-  // Xác định màu dựa trên loại
-  const getTypeColor = (type: string) => {
-    switch (type.toLowerCase()) {
-      case 'technical content':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'narrative':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'legal':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'visual':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'research':
-        return 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200';
-      case 'planning':
-        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200';
-      case 'financial':
-        return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-    }
-  };
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
 
   return (
     <div
@@ -323,8 +287,8 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
       {...attributes}
       {...listeners}
       className={`rounded-lg border bg-card p-4 shadow-sm transition-all duration-200 hover:shadow-md ${
-        isDragging ? 'opacity-50 scale-105 shadow-lg' : ''
-      } ${isDraggingOver ? 'border-[var(--selection)]' : ''}`}
+        isDragging ? "opacity-50 scale-105 shadow-lg" : ""
+      } ${isDraggingOver ? "border-[var(--selection)]" : ""}`}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-2 w-full">
@@ -334,16 +298,10 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
               <IconCircleCheckFilled className="h-4 w-4 text-green-500" />
             )}
           </div>
-          <div className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(item.type)}`}>
-            {item.type}
-          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0"
-            >
+            <Button variant="ghost" className="h-8 w-8 p-0">
               <IconDotsVertical className="h-4 w-4" />
               <span className="sr-only">Open menu</span>
             </Button>
@@ -353,9 +311,7 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
             <DropdownMenuItem>Make a copy</DropdownMenuItem>
             <DropdownMenuItem>Favorite</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              Delete
-            </DropdownMenuItem>
+            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -368,7 +324,7 @@ function KanbanCard({ item, isDraggingOver }: { item: z.infer<typeof schema>; is
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // Thêm component KanbanColumn

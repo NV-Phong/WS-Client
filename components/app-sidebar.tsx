@@ -98,7 +98,7 @@ const data = {
    navSecondary: [
       {
          title: "Settings",
-         url: "#",
+         url: "/themes/color-visualizer",
          icon: "setting-06-solid-rounded",
       }
    ],

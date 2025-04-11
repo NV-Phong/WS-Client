@@ -1,6 +1,6 @@
 import * as React from "react";
-import Cookies from "js-cookie"; // Thêm import js-cookie
-import { ChevronsUpDown, Loader2, User } from "lucide-react"; // Added default icon
+import Cookies from "js-cookie";
+import { ChevronsUpDown, Loader2 } from "lucide-react";
 import {
    DropdownMenu,
    DropdownMenuContent,
