@@ -44,8 +44,6 @@ export function TaskSelector({
     // Icon cho Priority
     if (placeholder.toLowerCase().includes("priority")) {
       switch (value.toLowerCase()) {
-        case "urgent":
-          return <Flag className="mr-2 h-4 w-4 text-red-500" />;
         case "high":
           return <Flag className="mr-2 h-4 w-4 text-orange-500" />;
         case "medium":

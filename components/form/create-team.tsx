@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createPortal } from "react-dom";
-import { useCreateTeam } from "@/hooks/team/use-create-team";
+import { useCreateTeam } from "@/hooks/beta/team/use-create-team";
 
 interface CreateTeamPopoverProps {
    children: React.ReactNode;

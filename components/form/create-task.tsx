@@ -9,40 +9,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { TaskSelector } from "./task-selector";
+import { TaskSelector } from "./task-selector"; // Import TaskSelector
 import { createPortal } from "react-dom";
+import { useCreateTask } from "@/hooks/beta/task/use-create-task"; // Use the task creation hook
+import Cookies from "js-cookie"; // Import Cookies
 
-interface CreateTaskPopoverProps {
-   children: React.ReactNode;
-   onTaskCreated?: () => void;
-}
-
-// Định nghĩa các loại task
-const taskTypes = [
-   { value: "feature", label: "Feature" },
-   { value: "bug", label: "Bug" },
-   { value: "improvement", label: "Improvement" },
-   { value: "documentation", label: "Documentation" },
-];
-
-// Định nghĩa các trạng thái task
-const taskStatuses = [
-   { value: "todo", label: "To Do" },
-   { value: "in progress", label: "In Progress" },
-   { value: "in review", label: "In Review" },
-   { value: "done", label: "Done" }
-];
-
-// Định nghĩa danh sách người dùng
-const assignees = [
-   { value: "eddie", label: "Eddie Lake" },
-   { value: "jamik", label: "Jamik Tashpulatov" },
-   { value: "emily", label: "Emily Whalen" },
-   { value: "sarah", label: "Sarah Chen" },
-   { value: "david", label: "David Kim" },
-];
-
-// Định nghĩa các mức độ ưu tiên
 const priorities = [
    { value: "urgent", label: "Urgent" },
    { value: "high", label: "High" },
@@ -50,50 +21,50 @@ const priorities = [
    { value: "low", label: "Low" },
 ];
 
+interface CreateTaskPopoverProps {
+   children: React.ReactNode;
+   onTaskCreated?: () => void;
+}
+
 export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopoverProps) {
    const [open, setOpen] = React.useState(false);
-   const [isLoading, setIsLoading] = React.useState(false);
-   const [formData, setFormData] = React.useState({
-      taskHeader: "",
-      taskDescription: "",
-      taskType: "",
-      taskStatus: "todo",
-      assignee: "",
-      priority: "low",
-   });
+   const [taskName, setTaskName] = React.useState("");
+   const [taskDescription, setTaskDescription] = React.useState("");
+   const [priority, setPriority] = React.useState("medium"); // Add state for priority
+   const { createTask, isLoading } = useCreateTask();
 
-   const handleChange = (field: string, value: string) => {
-      setFormData(prev => ({ ...prev, [field]: value }));
+   const capitalizePriority = (value: string) => {
+      return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
    };
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      setIsLoading(true);
-      
+
+      const idProject = Cookies.get("IDProject");
+      if (!idProject) {
+         console.error("Project ID not found in cookies.");
+         return;
+      }
+
       try {
-         console.log(formData);
-         
-         // Reset form
-         setFormData({
-            taskHeader: "",
-            taskDescription: "",
-            taskType: "",
-            taskStatus: "todo",
-            assignee: "",
-            priority: "low",
+         await createTask({
+            idProject,
+            idAssignee: "67f69e24b94678ef4e0d910d",
+            status: "67f69e24b94678ef4e0d910d",
+            taskName,
+            priority: capitalizePriority(priority), // Transform priority
+            startDay: new Date().toISOString(),
+            endDay: new Date().toISOString(),
+            dueDay: new Date().toISOString(),
+            tag: [],
          });
-         
-         // Close popover
+         setTaskName("");
+         setTaskDescription("");
+         setPriority("medium"); // Reset priority
          setOpen(false);
-         
-         // Callback if provided
-         if (onTaskCreated) {
-            onTaskCreated();
-         }
+         if (onTaskCreated) onTaskCreated();
       } catch (error) {
          console.error("Error creating task:", error);
-      } finally {
-         setIsLoading(false);
       }
    };
 
@@ -119,12 +90,12 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                   </div>
                   <div className="grid gap-3">
                      <div className="items-center gap-4">
-                        <Label htmlFor="taskHeader" className="pb-1">Task Name</Label>
+                        <Label htmlFor="taskName" className="pb-1">Task Name</Label>
                         <Input
-                           id="taskHeader"
-                           value={formData.taskHeader}
-                           onChange={(e) => handleChange("taskHeader", e.target.value)}
-                           placeholder="Enter task header"
+                           id="taskName"
+                           value={taskName}
+                           onChange={(e) => setTaskName(e.target.value)}
+                           placeholder="Enter task name"
                            required
                            disabled={isLoading}
                         />
@@ -133,8 +104,8 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                         <Label htmlFor="taskDescription" className="pb-1">Task Description</Label>
                         <Textarea
                            id="taskDescription"
-                           value={formData.taskDescription}
-                           onChange={(e) => handleChange("taskDescription", e.target.value)}
+                           value={taskDescription}
+                           onChange={(e) => setTaskDescription(e.target.value)}
                            placeholder="Enter task description"
                            className="resize-none"
                            rows={3}
@@ -142,39 +113,12 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                         />
                      </div>
                      <div className="items-center gap-4">
-                        <Label htmlFor="taskType" className="pb-1">Task Type</Label>
-                        <TaskSelector
-                           value={formData.taskType}
-                           onValueChange={(value) => handleChange("taskType", value)}
-                           options={taskTypes}
-                           placeholder="Select task type"
-                        />
-                     </div>
-                     <div className="items-center gap-4">
                         <Label htmlFor="priority" className="pb-1">Priority</Label>
                         <TaskSelector
-                           value={formData.priority}
-                           onValueChange={(value) => handleChange("priority", value)}
+                           value={priority}
+                           onValueChange={(value) => setPriority(value)}
                            options={priorities}
                            placeholder="Select priority"
-                        />
-                     </div>
-                     <div className="items-center gap-4">
-                        <Label htmlFor="taskStatus" className="pb-1">Status</Label>
-                        <TaskSelector
-                           value={formData.taskStatus}
-                           onValueChange={(value) => handleChange("taskStatus", value)}
-                           options={taskStatuses}
-                           placeholder="Select status"
-                        />
-                     </div>
-                     <div className="items-center gap-4">
-                        <Label htmlFor="assignee" className="pb-1">Assignee</Label>
-                        <TaskSelector
-                           value={formData.assignee}
-                           onValueChange={(value) => handleChange("assignee", value)}
-                           options={assignees}
-                           placeholder="Select assignee"
                         />
                      </div>
                      <div className="flex justify-between gap-2">
@@ -201,4 +145,4 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
          </Popover>
       </>
    );
-} 
+}
