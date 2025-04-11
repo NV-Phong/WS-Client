@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useGetNotes } from "@/hooks/beta/note/use-get-note";
+import { CreateNotePopover } from "@/components/form/create-note";
 
 export default function WorkspaceDetail() {
    const params = useParams();
@@ -20,6 +21,7 @@ export default function WorkspaceDetail() {
    useEffect(() => {
       const storedWorkspaceId = Cookies.get("IDWorkspace");
       const storedWorkspaceName = Cookies.get("WorkSpaceName");
+
       if (storedWorkspaceId) {
          setWorkspaceId(storedWorkspaceId);
       }
@@ -51,9 +53,16 @@ export default function WorkspaceDetail() {
                title={`WORKSPACE • ${workspaceName}`}
                showNewWorkspace={false}
                rightContent={
-                  <Button variant="outline" size="sm" onClick={handleBackToWorkspaces}>
-                     Back to Workspaces
-                  </Button>
+                  <div className="flex gap-2">
+                     <CreateNotePopover>
+                        <Button variant="default" size="sm">
+                           Create Note
+                        </Button>
+                     </CreateNotePopover>
+                     <Button variant="outline" size="sm" onClick={handleBackToWorkspaces}>
+                        Back to Workspaces
+                     </Button>
+                  </div>
                }
             />
             <div className="flex flex-1 flex-col">

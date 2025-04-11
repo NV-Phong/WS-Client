@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,10 @@ interface CreateTaskPopoverProps {
    onTaskCreated?: () => void;
 }
 
-export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopoverProps) {
+export function CreateTaskPopover({
+   children,
+   onTaskCreated,
+}: CreateTaskPopoverProps) {
    const [open, setOpen] = React.useState(false);
    const [taskName, setTaskName] = React.useState("");
    const [taskDescription, setTaskDescription] = React.useState("");
@@ -46,11 +49,22 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
          return;
       }
 
+      // Get IDs from cookies or use default values
+      const IDAssignee = Cookies.get('IDAssignee') || "";
+      const IDStatus = Cookies.get('IDStatus') || "";
+
+      if (!Cookies.get('IDAssignee')) {
+        Cookies.set('IDAssignee', IDAssignee);
+      }
+      if (!Cookies.get('IDStatus')) {
+        Cookies.set('IDStatus', IDStatus);
+      }
+
       try {
          await createTask({
             idProject,
-            idAssignee: "67f69e24b94678ef4e0d910d",
-            status: "67f69e24b94678ef4e0d910d",
+            idAssignee: IDAssignee,
+            status: IDStatus,
             taskName,
             priority: capitalizePriority(priority), // Transform priority
             startDay: new Date().toISOString(),
@@ -63,6 +77,9 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
          setPriority("medium"); // Reset priority
          setOpen(false);
          if (onTaskCreated) onTaskCreated();
+
+         // Reload the page
+         window.location.reload();
       } catch (error) {
          console.error("Error creating task:", error);
       }
@@ -70,27 +87,43 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
 
    return (
       <>
-         {open && createPortal(
-            <div 
-               className="fixed inset-0 bg-background/30 backdrop-blur-[10px] z-[49]"
-               onClick={() => setOpen(false)}
-               style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-            />,
-            document.body
-         )}
+         {open &&
+            createPortal(
+               <div
+                  className="fixed inset-0 bg-background/30 backdrop-blur-[10px] z-[49]"
+                  onClick={() => setOpen(false)}
+                  style={{
+                     position: "fixed",
+                     top: 0,
+                     left: 0,
+                     right: 0,
+                     bottom: 0,
+                  }}
+               />,
+               document.body
+            )}
          <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>{children}</PopoverTrigger>
-            <PopoverContent className="w-80 mr-4 bg-background z-[51] relative" side="right" align="start" sideOffset={5}>
+            <PopoverContent
+               className="w-80 mr-4 bg-background z-[51] relative"
+               side="right"
+               align="start"
+               sideOffset={5}
+            >
                <form onSubmit={handleSubmit} className="grid gap-4">
                   <div className="space-y-2">
-                     <h4 className="font-medium leading-none">CREATE NEW TASK</h4>
+                     <h4 className="font-medium leading-none">
+                        CREATE NEW TASK
+                     </h4>
                      <p className="text-sm text-muted-foreground">
                         Create a new task for your project.
                      </p>
                   </div>
                   <div className="grid gap-3">
                      <div className="items-center gap-4">
-                        <Label htmlFor="taskName" className="pb-1">Task Name</Label>
+                        <Label htmlFor="taskName" className="pb-1">
+                           Task Name
+                        </Label>
                         <Input
                            id="taskName"
                            value={taskName}
@@ -101,7 +134,9 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                         />
                      </div>
                      <div className="items-center gap-4">
-                        <Label htmlFor="taskDescription" className="pb-1">Task Description</Label>
+                        <Label htmlFor="taskDescription" className="pb-1">
+                           Task Description
+                        </Label>
                         <Textarea
                            id="taskDescription"
                            value={taskDescription}
@@ -113,7 +148,9 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                         />
                      </div>
                      <div className="items-center gap-4">
-                        <Label htmlFor="priority" className="pb-1">Priority</Label>
+                        <Label htmlFor="priority" className="pb-1">
+                           Priority
+                        </Label>
                         <TaskSelector
                            value={priority}
                            onValueChange={(value) => setPriority(value)}
@@ -131,8 +168,8 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                         >
                            Cancel
                         </Button>
-                        <Button 
-                           type="submit" 
+                        <Button
+                           type="submit"
                            className="w-2/5"
                            disabled={isLoading}
                         >
