@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import { useGetNotes } from "@/hooks/beta/note/use-get-note";
 
 export default function WorkspaceDetail() {
    const params = useParams();
@@ -25,10 +26,11 @@ export default function WorkspaceDetail() {
       if (storedWorkspaceName) {
          setWorkspaceName(storedWorkspaceName);
       } else {
-         // Nếu không có cookie, sử dụng tên từ URL
          setWorkspaceName(workspaceSlug.replace(/-/g, ' '));
       }
    }, [workspaceSlug]);
+
+   const { notes, isLoading, error } = useGetNotes(workspaceId || "");
 
    const handleBackToWorkspaces = () => {
       router.push('/workspace');
@@ -62,16 +64,45 @@ export default function WorkspaceDetail() {
                            <div className="text-center py-8">
                               <p className="text-muted-foreground">Không tìm thấy thông tin workspace</p>
                            </div>
+                        ) : isLoading ? (
+                           <div className="text-center py-8">
+                              <p className="text-muted-foreground">Đang tải ghi chú...</p>
+                           </div>
+                        ) : error ? (
+                           <div className="text-center py-8">
+                              <p className="text-muted-foreground">{error}</p>
+                           </div>
+                        ) : notes.length > 0 ? (
+                           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {notes.map((note) => (
+                                 <Card key={note._id}>
+                                    <CardHeader>
+                                       <CardTitle>{note.title}</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                       <p>{note.content}</p>
+                                       {note.attachment.length > 0 && (
+                                          <div className="mt-4">
+                                             <h4 className="font-semibold">Attachments:</h4>
+                                             <ul>
+                                                {note.attachment.map((file) => (
+                                                   <li key={file._id}>
+                                                      <a href={file.fileURL} target="_blank" rel="noopener noreferrer">
+                                                         {file.fileName} ({file.fileType})
+                                                      </a>
+                                                   </li>
+                                                ))}
+                                             </ul>
+                                          </div>
+                                       )}
+                                    </CardContent>
+                                 </Card>
+                              ))}
+                           </div>
                         ) : (
-                           <Card>
-                              <CardHeader>
-                                 <CardTitle>{workspaceName}</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                 <p>Workspace Details</p>
-                                 {/* Thêm nội dung chi tiết workspace ở đây */}
-                              </CardContent>
-                           </Card>
+                           <div className="text-center py-8">
+                              <p className="text-muted-foreground">Không có ghi chú nào.</p>
+                           </div>
                         )}
                      </div>
                   </div>
