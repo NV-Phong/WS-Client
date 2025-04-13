@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
+import ListStickyNotes from "@/components/ui-engineer/list-sticky-notes";
 
 export default function WorkspaceDetail() {
    const params = useParams();
@@ -26,12 +26,12 @@ export default function WorkspaceDetail() {
          setWorkspaceName(storedWorkspaceName);
       } else {
          // Nếu không có cookie, sử dụng tên từ URL
-         setWorkspaceName(workspaceSlug.replace(/-/g, ' '));
+         setWorkspaceName(workspaceSlug.replace(/-/g, " "));
       }
    }, [workspaceSlug]);
 
    const handleBackToWorkspaces = () => {
-      router.push('/workspace');
+      router.push("/workspace");
    };
 
    return (
@@ -45,38 +45,22 @@ export default function WorkspaceDetail() {
       >
          <AppSidebar variant="inset" />
          <SidebarInset>
-            <SiteHeader 
+            <SiteHeader
                title={`WORKSPACE • ${workspaceName}`}
                showNewWorkspace={false}
                rightContent={
-                  <Button variant="outline" size="sm" onClick={handleBackToWorkspaces}>
+                  <Button
+                     variant="outline"
+                     size="sm"
+                     onClick={handleBackToWorkspaces}
+                  >
                      Back to Workspaces
                   </Button>
                }
             />
-            <div className="flex flex-1 flex-col">
-               <div className="@container/main flex flex-1 flex-col gap-2">
-                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                     <div className="px-4 lg:px-6">
-                        {!workspaceId ? (
-                           <div className="text-center py-8">
-                              <p className="text-muted-foreground">Không tìm thấy thông tin workspace</p>
-                           </div>
-                        ) : (
-                           <Card>
-                              <CardHeader>
-                                 <CardTitle>{workspaceName}</CardTitle>
-                              </CardHeader>
-                              <CardContent>
-                                 <p>Workspace Details</p>
-                                 {/* Thêm nội dung chi tiết workspace ở đây */}
-                              </CardContent>
-                           </Card>
-                        )}
-                     </div>
-                  </div>
-               </div>
-            </div>
+
+            <ListStickyNotes widgetId={workspaceId} />
+            
          </SidebarInset>
       </SidebarProvider>
    );

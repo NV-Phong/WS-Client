@@ -37,7 +37,6 @@ export default function Auth() {
                initialY={-500}
                rotation={-8}
                zIndex={1}
-               animation="flyIn"
             />
          </AnimatePresence>
          
@@ -63,7 +62,6 @@ export default function Auth() {
                   initialY={-350}
                   rotation={5}
                   zIndex={2}
-                  animation="flyIn"
                />
             )}
          </AnimatePresence>
@@ -80,7 +78,6 @@ export default function Auth() {
                   initialY={-350}
                   rotation={-3}
                   zIndex={3}
-                  animation="flyIn"
                />
             )}
          </AnimatePresence>
