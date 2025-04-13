@@ -85,16 +85,19 @@ export default function Project() {
               ) : error ? (
                 <div>Error loading tasks: {error}</div>
               ) : (
-                <DataTable key={tableKey} data={tasks.map(task => ({
-                  id: parseInt(task.IDTask) || 0,
-                  header: task.TaskName,
-                  description: task.TaskDescription,
-                  type: task.Priority,
-                  status: task.status?.Status || "Unknown",
-                  target: task.project?.ProjectName || "Unknown",
-                  limit: task.CreateAt ? new Date(task.CreateAt).toLocaleDateString() : "N/A",
-                  reviewer: task.assignee || "Unassigned"
-                }))} />
+                <DataTable 
+                  key={tableKey} 
+                  data={tasks.map(task => ({
+                    id: String(task.IDTask), // Convert ID to string
+                    header: task.TaskName || '',
+                    description: task.TaskDescription || '',
+                    type: task.Priority || '',
+                    status: task.status?.Status || "Unknown",
+                    target: task.project?.ProjectName || "Unknown",
+                    limit: task.CreateAt ? new Date(task.CreateAt).toLocaleDateString() : "N/A",
+                    reviewer: String(task.assignee || "Unassigned") // Ensure reviewer is string
+                  }))} 
+                />
               )}
               </div>
             </div>
