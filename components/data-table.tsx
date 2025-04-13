@@ -60,6 +60,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 import { useIsMobile } from "@/hooks/use-mobile"
+import { useGetStatuses } from "@/hooks/status/use-get-statuses"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -546,6 +547,7 @@ export function DataTable({
 }: {
   data: z.infer<typeof schema>[]
 }) {
+  const { statuses, isLoading: statusesLoading } = useGetStatuses();
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -619,7 +621,7 @@ export function DataTable({
     if (active && over && active.id !== over.id && !isUpdating) {
       setIsUpdating(true)
       
-      if (typeof over.id === 'string' && ['To Do', 'In Progress', 'In Review', 'Done'].includes(over.id)) {
+      if (typeof over.id === 'string' && statuses.some(status => status.Status === over.id)) {
         // Cập nhật status khi kéo vào cột mới
         const newStatus = over.id as string;
         setData((prevData) =>
@@ -864,57 +866,37 @@ export function DataTable({
         value="kanban"
         className="flex flex-col gap-4 px-4 lg:px-6"
       >
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-semibold">Kanban Board</h2>
-          <div className="flex items-center gap-2">
-            <CreateTaskPopover>
-              <Button variant="outline" size="sm">
-                <IconPlus className="h-4 w-4 mr-1" />
-                Add Task
-              </Button>
-            </CreateTaskPopover>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <IconLayoutColumns className="h-4 w-4 mr-1" />
-                  View Options
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Compact View</DropdownMenuItem>
-                <DropdownMenuItem>Detailed View</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Group by Type</DropdownMenuItem>
-                <DropdownMenuItem>Group by Reviewer</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {statusesLoading ? (
+          <div className="flex items-center justify-center p-8">
+            <IconLoader className="h-6 w-6 animate-spin" />
           </div>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          modifiers={[restrictToWindowEdges]}
-          autoScroll={true}
-        >
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {["To Do", "In Progress", "In Review", "Done"].map((status) => (
-              <KanbanColumn
-                key={status}
-                status={status}
-                items={data.filter((item) => item.status === status)}
-              />
-            ))}
-          </div>
-          <DragOverlay dropAnimation={dropAnimation}>
-            {activeId ? (
-              <KanbanCard
-                item={data.find((item) => item.id === activeId)!}
-              />
-            ) : null}
-          </DragOverlay>
-        </DndContext>
+        ) : (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            modifiers={[restrictToWindowEdges]}
+            autoScroll={true}
+          >
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {statuses.map((status) => (
+                <KanbanColumn
+                  key={status.IDStatus}
+                  status={status.Status}
+                  items={data.filter((item) => item.status === status.Status)}
+                />
+              ))}
+            </div>
+            <DragOverlay dropAnimation={dropAnimation}>
+              {activeId ? (
+                <KanbanCard
+                  item={data.find((item) => item.id === activeId)!}
+                />
+              ) : null}
+            </DragOverlay>
+          </DndContext>
+        )}
       </TabsContent>
     </Tabs>
   )
@@ -942,6 +924,7 @@ const chartConfig = {
 
 function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
   const isMobile = useIsMobile()
+  const { statuses } = useGetStatuses();
 
   return (
     <Drawer direction={isMobile ? "bottom" : "right"}>
@@ -1054,9 +1037,11 @@ function TableCellViewer({ item }: { item: z.infer<typeof schema> }) {
                     <SelectValue placeholder="Select a status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Done">Done</SelectItem>
-                    <SelectItem value="In Progress">In Progress</SelectItem>
-                    <SelectItem value="Not Started">Not Started</SelectItem>
+                    {statuses.map((status) => (
+                      <SelectItem key={status.IDStatus} value={status.Status}>
+                        {status.Status}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
