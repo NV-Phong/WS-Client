@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { TaskSelector } from "./task-selector";
 import { createPortal } from "react-dom";
+import { useGetStatuses } from "@/hooks/status/use-get-statuses";
+import { useCreateTask } from "@/hooks/task/use-create-task";
 
 interface CreateTaskPopoverProps {
    children: React.ReactNode;
@@ -23,14 +25,6 @@ const taskTypes = [
    { value: "bug", label: "Bug" },
    { value: "improvement", label: "Improvement" },
    { value: "documentation", label: "Documentation" },
-];
-
-// Định nghĩa các trạng thái task
-const taskStatuses = [
-   { value: "todo", label: "To Do" },
-   { value: "in progress", label: "In Progress" },
-   { value: "in review", label: "In Review" },
-   { value: "done", label: "Done" }
 ];
 
 // Định nghĩa danh sách người dùng
@@ -53,11 +47,14 @@ const priorities = [
 export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopoverProps) {
    const [open, setOpen] = React.useState(false);
    const [isLoading, setIsLoading] = React.useState(false);
+   const { statuses } = useGetStatuses();
+   const { createTask } = useCreateTask();
+   // Removed direct reload call as it should be handled by parent component
    const [formData, setFormData] = React.useState({
       taskHeader: "",
       taskDescription: "",
       taskType: "",
-      taskStatus: "todo",
+      taskStatus: statuses.length > 0 ? statuses[0].IDStatus : "",
       assignee: "",
       priority: "low",
    });
@@ -71,14 +68,15 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
       setIsLoading(true);
       
       try {
-         console.log(formData);
+         await createTask(formData);
+         // Removed reload call - parent component should handle data refresh via onTaskCreated callback
          
          // Reset form
          setFormData({
             taskHeader: "",
             taskDescription: "",
             taskType: "",
-            taskStatus: "todo",
+            taskStatus: statuses.length > 0 ? statuses[0].IDStatus : "",
             assignee: "",
             priority: "low",
          });
@@ -159,12 +157,15 @@ export function CreateTaskPopover({ children, onTaskCreated }: CreateTaskPopover
                            placeholder="Select priority"
                         />
                      </div>
-                     <div className="items-center gap-4">
-                        <Label htmlFor="taskStatus" className="pb-1">Status</Label>
+                     <div className="grid gap-2">
+                        <Label htmlFor="taskStatus">Status</Label>
                         <TaskSelector
                            value={formData.taskStatus}
                            onValueChange={(value) => handleChange("taskStatus", value)}
-                           options={taskStatuses}
+                           options={statuses.map(status => ({
+                              value: status.IDStatus,
+                              label: status.Status
+                           }))}
                            placeholder="Select status"
                         />
                      </div>

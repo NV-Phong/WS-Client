@@ -27,6 +27,7 @@ interface Task {
   IDTag: string | null;
   IDAssignee: string | null;
   TaskName: string;
+  TaskDescription: string;
   Priority: string;
   CreateAt: string;
   StartDay: string | null;

@@ -10,13 +10,14 @@ import { Button } from "@/components/ui/button";
 import { deslugifyProjectName } from '@/lib/utils';
 import { DataTable } from '@/components/data-table';
 import { CreateTaskPopover } from '@/components/form/create-task';
-import data from '../data.json';
+import { useGetTasks } from "@/hooks/task/use-get-tasks";
 
 export default function Project() {
   const params = useParams();
   const router = useRouter();
   const [projectId, setProjectId] = useState<string | null>(null);
   const [projectName, setProjectName] = useState<string>("");
+  const { reload, tasks, isLoading, error } = useGetTasks();
   const slugifiedName = params.projectname as string;
   const isInitialized = useRef(false);
 
@@ -64,7 +65,7 @@ export default function Project() {
           showNewWorkspace={false}
           rightContent={
             <div className="flex items-center gap-2">
-              <CreateTaskPopover>
+              <CreateTaskPopover onTaskCreated={reload}>
                 <Button variant="outline" size="sm">
                   New Task
                 </Button>
@@ -79,7 +80,22 @@ export default function Project() {
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               <div className="px-4 lg:px-6">
-              <DataTable key={tableKey} data={data} />
+              {isLoading ? (
+                <div>Loading tasks...</div>
+              ) : error ? (
+                <div>Error loading tasks: {error}</div>
+              ) : (
+                <DataTable key={tableKey} data={tasks.map(task => ({
+                  id: parseInt(task.IDTask) || 0,
+                  header: task.TaskName,
+                  description: task.TaskDescription,
+                  type: task.Priority,
+                  status: task.status?.Status || "Unknown",
+                  target: task.project?.ProjectName || "Unknown",
+                  limit: task.CreateAt ? new Date(task.CreateAt).toLocaleDateString() : "N/A",
+                  reviewer: task.assignee || "Unassigned"
+                }))} />
+              )}
               </div>
             </div>
           </div>
