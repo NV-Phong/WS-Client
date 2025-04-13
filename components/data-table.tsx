@@ -61,6 +61,7 @@ import { z } from "zod"
 
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useGetStatuses } from "@/hooks/status/use-get-statuses"
+import { useGetTasks } from "@/hooks/task/use-get-tasks"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -547,8 +548,26 @@ export function DataTable({
 }: {
   data: z.infer<typeof schema>[]
 }) {
+  const [data, setData] = React.useState(initialData)
+  const { tasks } = useGetTasks()
+
+  React.useEffect(() => {
+    if (tasks.length > 0) {
+      // Map the task data to match the schema expected by the table
+      const mappedData = tasks.map(task => ({
+        id: Number(task.IDTask),
+        header: task.TaskName,
+        type: task.project?.ProjectName || 'Unknown',
+        status: task.status?.Status || 'Unknown',
+        target: task.StartDay || 'Not set',
+        limit: task.EndDay || 'Not set',
+        reviewer: task.assignee || 'Unassigned',
+      }));
+      setData(mappedData);
+    }
+  }, [tasks]);
+
   const { statuses, isLoading: statusesLoading } = useGetStatuses();
-  const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
