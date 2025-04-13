@@ -1,3 +1,4 @@
+'use client';
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,50 +10,58 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { createPortal } from "react-dom";
-import { useState } from "react";
-import { useCreateTeam } from "@/hooks/team/use-create-team";
+import { useCreateWorkspace } from "@/hooks/project/use-create-project";
 
-interface CreateTeamPopoverProps {
+interface CreateWorkspacePopoverProps {
    children: React.ReactNode;
-   onTeamCreated: () => void;
+   onSuccess?: () => void;
+   teamId: string;
 }
 
-export function CreateTeamPopover({ children, onTeamCreated }: CreateTeamPopoverProps) {
-   const { createTeam } = useCreateTeam();
-   const [isOpen, setIsOpen] = useState(false);
-   const [teamName, setTeamName] = React.useState("");
-   const [teamDescription, setTeamDescription] = React.useState("");
-   const [isLoading, setIsLoading] = React.useState(false);
-
-   const handleCreateTeam = async (data: { teamName: string; teamDescription: string }) => {
-      try {
-         setIsLoading(true);
-         await createTeam(data);
-         setIsOpen(false);
-         onTeamCreated(); // Call the refetch function after successful creation
-      } catch (error) {
-         console.error("Failed to create team:", error);
-      } finally {
-         setIsLoading(false);
-      }
-   };
+export function CreateProjectPopover({ children, onSuccess, teamId }: CreateWorkspacePopoverProps) {
+   const [open, setOpen] = React.useState(false);
+   const [projectName, setProjectName] = React.useState("");
+   const [projectDescription, setProjectDescription] = React.useState("");
+   const { createWorkspace, isLoading } = useCreateWorkspace();
 
    const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      await handleCreateTeam({ teamName, teamDescription });
+      
+      try {
+         await createWorkspace({
+            projectName: projectName,
+            projectDescription: projectDescription,
+            IDTeam: teamId
+         });
+         
+         // Reset form
+         setProjectName("");
+         setProjectDescription("");
+         
+         // Close popover
+         setOpen(false);
+         
+         // Callback if provided
+         if (onSuccess) {
+            onSuccess();
+         }
+      } catch (error) {
+         // Error is already handled by the hook
+         console.error("Failed to create project:", error);
+      }
    };
 
    return (
       <>
-         {isOpen && createPortal(
+         {open && createPortal(
             <div 
                className="fixed inset-0 bg-background/30 backdrop-blur-[10px] z-[49]"
-               onClick={() => setIsOpen(false)}
+               onClick={() => setOpen(false)}
                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
             />,
             document.body
          )}
-         <Popover open={isOpen} onOpenChange={setIsOpen}>
+         <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
                {children}
             </PopoverTrigger>
@@ -64,9 +73,9 @@ export function CreateTeamPopover({ children, onTeamCreated }: CreateTeamPopover
             >
                <form onSubmit={handleSubmit} className="grid gap-4">
                   <div className="space-y-2">
-                     <h4 className="font-medium leading-none">CREATE NEW TEAM</h4>
+                     <h4 className="font-medium leading-none">CREATE NEW PROJECT</h4>
                      <p className="text-sm text-muted-foreground">
-                        Create a new team to organize your work.
+                        Create a new project to manage your notes and schedule.
                      </p>
                   </div>
                   <div className="grid gap-3">
@@ -74,9 +83,9 @@ export function CreateTeamPopover({ children, onTeamCreated }: CreateTeamPopover
                         <Label htmlFor="name" className="pb-1">Name</Label>
                         <Input
                            id="name"
-                           value={teamName}
-                           onChange={(e) => setTeamName(e.target.value)}
-                           placeholder="Team Name"
+                           value={projectName}
+                           onChange={(e) => setProjectName(e.target.value)}
+                           placeholder="Project Name"
                            required
                            disabled={isLoading}
                         />
@@ -85,9 +94,9 @@ export function CreateTeamPopover({ children, onTeamCreated }: CreateTeamPopover
                         <Label htmlFor="description" className="pb-1">Description</Label>
                         <Textarea
                            id="description"
-                           value={teamDescription}
-                           onChange={(e) => setTeamDescription(e.target.value)}
-                           placeholder="Team Description"
+                           value={projectDescription}
+                           onChange={(e) => setProjectDescription(e.target.value)}
+                           placeholder="Project Description"
                            disabled={isLoading}
                         />
                      </div>
@@ -96,7 +105,7 @@ export function CreateTeamPopover({ children, onTeamCreated }: CreateTeamPopover
                            type="button" 
                            variant="outline" 
                            className="w-2/5" 
-                           onClick={() => setIsOpen(false)}
+                           onClick={() => setOpen(false)}
                            disabled={isLoading}
                         >
                            Cancel

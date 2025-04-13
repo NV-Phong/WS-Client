@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Icon } from "@/components/ui-engineer/Icon"
 import { useNavigation } from "@/components/context/navigation-context"
 
@@ -21,12 +22,14 @@ export function NavSecondary({
     icon: string
   }[]
 }) {
+  const router = useRouter()
   const { activeItem, setActiveItem, activeSection, setActiveSection } = useNavigation()
   const [hoveredItem, setHoveredItem] = useState<string>("")
 
-  const handleItemClick = (title: string) => {
+  const handleItemClick = (title: string, url: string) => {
     setActiveItem(title)
     setActiveSection("secondary")
+    router.push(url)
   }
 
   return (
@@ -40,7 +43,7 @@ export function NavSecondary({
           >
             <SidebarMenuButton 
               tooltip={item.title}
-              onClick={() => handleItemClick(item.title)}
+              onClick={() => handleItemClick(item.title, item.url)}
               onMouseEnter={() => setHoveredItem(item.title)}
               onMouseLeave={() => setHoveredItem("")}
               className={`relative w-full rounded-lg transition-all duration-300 ease-out 

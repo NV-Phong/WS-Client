@@ -26,7 +26,7 @@ import Cookies from "js-cookie";
 import { slugifyProjectName } from "@/lib/utils";
 
 export default function WorkSpace() {
-   const { workspaces, isLoading, error } = useGetWorkspaces();
+   const { workspaces, isLoading, error, refreshWorkspaces } = useGetWorkspaces();
    const { deleteWorkspace, isLoading: isDeleting } = useDeleteWorkspace();
    const { handleWorkspaceDeleted } = useToast();
 
@@ -54,6 +54,7 @@ export default function WorkSpace() {
             <SiteHeader 
                title="Workspace"
                showNewWorkspace={true}
+               onWorkspaceCreated={refreshWorkspaces}
             />
             <div className="flex flex-1 flex-col">
                <div className="@container/main flex flex-1 flex-col gap-2">

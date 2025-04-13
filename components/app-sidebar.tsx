@@ -98,7 +98,7 @@ const data = {
    navSecondary: [
       {
          title: "Settings",
-         url: "#",
+         url: "/themes/color-visualizer",
          icon: "setting-06-solid-rounded",
       }
    ],
@@ -127,7 +127,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-   const { teams } = useGetTeams();
+   const { teams, refetch } = useGetTeams(); // Get refetch from useGetTeams
    
    const formattedTeams = teams.map(team => ({
       name: team.TeamName,
@@ -154,7 +154,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                </SidebarMenuItem>
             </SidebarMenu>
-            <TeamSwitcher teams={formattedTeams} />
+            <TeamSwitcher 
+               teams={formattedTeams} 
+               refetch={refetch} // Pass refetch to TeamSwitcher
+            />
          </SidebarHeader>
          <SidebarContent>
             <NavMain items={data.navMain} />

@@ -22,25 +22,26 @@ export function useGetProjects(teamId: string) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await axios.get<ProjectResponse>(
-          `${process.env.NEXT_PUBLIC_API_SERVER}/project/${teamId}`
-        );
+  const fetchProjects = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get<ProjectResponse>(
+        `${process.env.NEXT_PUBLIC_API_SERVER}/project/${teamId}`
+      );
 
-        if (response.status === 200) {
-          setProjects(response.data.data);
-        }
-      } catch (error: any) {
-        const errorMessage = error.response?.data?.message || "Không thể lấy danh sách projects. Vui lòng thử lại sau.";
-        setError(errorMessage);
-        showToast.error("Lỗi", errorMessage);
-      } finally {
-        setIsLoading(false);
+      if (response.status === 200) {
+        setProjects(response.data.data);
       }
-    };
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Không thể lấy danh sách projects. Vui lòng thử lại sau.";
+      setError(errorMessage);
+      showToast.error("Lỗi", errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     if (teamId) {
       fetchProjects();
     }
@@ -49,6 +50,7 @@ export function useGetProjects(teamId: string) {
   return {
     projects,
     isLoading,
-    error
+    error,
+    reload: fetchProjects // Expose reload function
   };
-} 
+}

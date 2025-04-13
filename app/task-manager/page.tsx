@@ -24,19 +24,33 @@ import {
 import Cookies from "js-cookie";
 import { slugifyProjectName } from '@/lib/utils';
 import Link from 'next/link';
+import { CreateProjectPopover } from "@/components/form/create-project";
 
 export default function ListProject() {
   const [teamId, setTeamId] = useState<string | null>(null);
+  const { projects, isLoading, error, reload } = useGetProjects(teamId || "");
   
   useEffect(() => {
+    // Khởi tạo giá trị teamId ban đầu
     const storedTeamId = Cookies.get("IDTeam");
     if (storedTeamId) {
       setTeamId(storedTeamId);
     }
+
+    // Lắng nghe sự kiện thay đổi team
+    const handleTeamChange = (event: CustomEvent<{ teamId: string }>) => {
+      setTeamId(event.detail.teamId);
+    };
+
+    // Đăng ký event listener
+    window.addEventListener('teamChange', handleTeamChange as EventListener);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('teamChange', handleTeamChange as EventListener);
+    };
   }, []);
   
-  const { projects, isLoading, error } = useGetProjects(teamId || "");
-
   return (
     <SidebarProvider
       style={
@@ -52,9 +66,14 @@ export default function ListProject() {
           title="Task Manager"
           showNewWorkspace={false}
           rightContent={
-            <Button variant="outline" size="sm">
-              New Project
-            </Button>
+            <CreateProjectPopover
+              onSuccess={() => reload()} 
+              teamId={teamId || ""}
+            >
+              <Button variant="outline" size="sm">
+                New Project
+              </Button>
+            </CreateProjectPopover>
           }
         />
         <div className="flex flex-1 flex-col">

@@ -20,7 +20,7 @@ interface CreateTeamResponse {
   };
 }
 
-export function useCreateTeam() {
+export function useCreateTeam(onSuccess?: () => void) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,6 +39,7 @@ export function useCreateTeam() {
 
       if (response.status === 201) {
         showToast.success("Tạo team thành công");
+        onSuccess?.();  // Call the onSuccess callback
         return response.data.data;
       }
     } catch (error: any) {
@@ -56,4 +57,4 @@ export function useCreateTeam() {
     isLoading,
     error
   };
-} 
+}

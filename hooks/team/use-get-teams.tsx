@@ -29,39 +29,42 @@ interface TeamResponse {
   data: Team[];
 }
 
+export const fetchTeams = async () => {
+  try {
+    const response = await axios.get<TeamResponse>(`${process.env.NEXT_PUBLIC_API_SERVER}/team`);
+    
+    if (response.status === 200) {
+      return response.data.data;
+    }
+    return [];
+  } catch (error: any) {
+    const errorMessage = error.response?.data?.message || "Không thể lấy danh sách team. Vui lòng thử lại sau.";
+    showToast.error("Lỗi", errorMessage);
+    return [];
+  }
+};
+
 export function useGetTeams() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTeams = async () => {
+  const getTeams = async () => {
     setIsLoading(true);
     setError(null);
-
-    try {
-      const response = await axios.get<TeamResponse>(`${process.env.NEXT_PUBLIC_API_SERVER}/team`);
-      
-      if (response.status === 200) {
-        setTeams(response.data.data);
-        showToast.success("Lấy danh sách team thành công");
-      }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "Không thể lấy danh sách team. Vui lòng thử lại sau.";
-      setError(errorMessage);
-      showToast.error("Lỗi", errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
+    const data = await fetchTeams();
+    setTeams(data);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchTeams();
+    getTeams();
   }, []);
 
   return {
     teams,
     isLoading,
     error,
-    refetch: fetchTeams
+    refetch: getTeams
   };
-} 
+}

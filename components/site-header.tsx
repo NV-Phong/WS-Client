@@ -13,6 +13,7 @@ interface SiteHeaderProps {
   showNewWorkspace?: boolean;
   rightContent?: React.ReactNode;
   centerContent?: React.ReactNode;
+  onWorkspaceCreated?: () => void;
 }
 
 export function SiteHeader({
@@ -20,7 +21,8 @@ export function SiteHeader({
   showSidebar = true,
   showNewWorkspace = true,
   rightContent,
-  centerContent
+  centerContent,
+  onWorkspaceCreated
 }: SiteHeaderProps) {
    const { state, showToast, handleSave, handleReset } = useToast();
    
@@ -46,9 +48,7 @@ export function SiteHeader({
             
             <div className="flex items-center gap-2">
                {rightContent || (showNewWorkspace && (
-                  <CreateWorkspacePopover onWorkspaceCreated={() => {
-                     window.location.reload();
-                  }}>
+                  <CreateWorkspacePopover onWorkspaceCreated={onWorkspaceCreated}>
                      <Button variant="outline" size="sm">
                         New Workspace
                      </Button>

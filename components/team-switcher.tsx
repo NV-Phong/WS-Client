@@ -22,6 +22,7 @@ import { Button } from "./ui/button";
 export function TeamSwitcher({
    teams,
    isLoading,
+   refetch, // Add this prop
 }: {
    teams: {
       name: string;
@@ -30,6 +31,7 @@ export function TeamSwitcher({
       idteam: string;
    }[];
    isLoading?: boolean;
+   refetch: () => void; // Add this type
 }) {
    const { isMobile } = useSidebar();
    const [activeTeam, setActiveTeam] = React.useState<{
@@ -59,15 +61,13 @@ export function TeamSwitcher({
       idteam: string;
    }) => {
       setActiveTeam(team);
-      // Lưu IDTeam vào cookie với thời hạn 7 ngày
+      // Lưu cookie như cũ
       Cookies.set("IDTeam", team.idteam, { 
          expires: 7,
          path: "/",
          secure: true,
          sameSite: "strict"
       });
-
-      // Lưu thêm thông tin team name để dễ dàng hiển thị
       Cookies.set("TeamName", team.name, {
          expires: 7,
          path: "/",
@@ -75,8 +75,11 @@ export function TeamSwitcher({
          sameSite: "strict"
       });
 
-      // Reload trang để cập nhật dữ liệu với team mới
-      window.location.reload();
+      // Thay vì reload, dispatch một custom event
+      const teamChangeEvent = new CustomEvent('teamChange', { 
+         detail: { teamId: team.idteam } 
+      });
+      window.dispatchEvent(teamChangeEvent);
    };
 
    if (isLoading) {
@@ -152,10 +155,7 @@ export function TeamSwitcher({
                   <DropdownMenuSeparator />
 
                   <div className="p-2">
-                     <CreateTeamPopover onTeamCreated={() => {
-                        // Refresh teams list
-                        window.location.reload();
-                     }}>
+                     <CreateTeamPopover onTeamCreated={refetch}>
                         <Button className="w-full">Create New Team</Button>
                      </CreateTeamPopover>
                   </div>
@@ -164,4 +164,4 @@ export function TeamSwitcher({
          </SidebarMenuItem>
       </SidebarMenu>
    );
-} 
+}
